@@ -1,0 +1,38 @@
+{
+  "name": "expressionist",
+  "version": "0.0.1",
+  "description": "Wrapper on top express to Write, Document and 'Create the client'™ of REST APIs",
+  "main": "./index.js",
+  "keywords": [
+    "api",
+    "express"
+  ],
+  "directories": {
+    "lib": ".",
+    "test": "test"
+  },
+  "scripts" : {
+    "test" : "tap test/test-*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/llafuente/node-expressionist.git"
+  },
+  "author": {
+    "name": "Luis Lafuente",
+    "email": "llafuente@noboxout.com",
+    "url": "http://www.noboxout.com"
+  },
+  "license": "MIT",
+  "engine": {
+    "node": ">=0.4"
+  },
+  "dependencies" : {
+    "express" : "*",
+    "validator" : "*"
+  },
+  "devDependencies": {
+    "tap" : "~0.2.5",
+    "request" : "*"
+  }
+}
