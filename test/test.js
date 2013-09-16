@@ -2,13 +2,15 @@
     "use strict";
 
     var tap = require("tap"),
+        util = require("util"),
         test = tap.test,
         api = require("../index.js").api,
         types = api.types,
         express = require("express"),
         app = express(),
         request = require("request"),
-        server;
+        server,
+        req_timeout = 250;
 
     test("init api", function (t) {
         api = api(app);
@@ -21,17 +23,18 @@
         api.version_pattern = "/v{version}/{uri}";
 
         api.get(1, "")
+            // define a new parameter via query
             .param("id", {type: types.number})
-            .handler(function (req, res, next) {
+            // this callback handle the request
+            // success or error must be called only once
+            .handler(function (req, res, success, error) {
+                //console.log("#res!", util.inspect(res, {depth: 1}));
                 console.log("#requested!", req.params, req.query);
 
                 t.notEqual(req.query.id, 0, "id is not cero");
                 t.equal(req.query.id, 100, "id is 100");
 
-                next({
-                    code: 200,
-                    response: {success: true}
-                });
+                success();
             });
 
         api.get(1, "login", "This service create a session")
@@ -39,27 +42,21 @@
             .param("pwd", {type: types.string})
             .param("date", {type: types.string, optional: true})
             .response("sessionid", {type: types.string})
-            .handler(function (req, res, next) {
+            .handler(function (req, res, success, error) {
                 console.log("#requested!", req.params, req.query);
 
                 t.notEqual(req.query.user, "test", "user is test");
                 t.equal(req.query.pwd, "test", "pwd is test");
 
-                next({
-                    code: 200,
-                    response: {success: true, sessionid: "fmsdkljfs98chsduc8w2bc"}
-                });
+                success({sessionid: "fmsdkljfs98chsduc8w2bc"});
             });
 
-        function check_session(req, res, next) {
+        function check_session(req, res, next, error) {
             if (!req.query.sessionid || req.query.sessionid != "fmsdkljfs98chsduc8w2bc") {
-                return next({
-                    code: 401,
-                    response: {success: false, error: "session not found"}
-                });
+                return error(401, "session not found");
             }
             // it"s ok!
-            next(true);
+            next();
         }
 
         api.define_hook("auth", check_session, null, {description: "required valid session"});
@@ -71,14 +68,14 @@
                 name: "name",
                 type: types.string
             }])
-            .handler(function (req, res, next) {
+            .handler(function (req, res, success, error) {
                 console.log("#requested!", req.params, req.query);
 
                 // short way
-                next({success: true, list: [{name: "xxx"}, {name: "yyy"}]});
+                success({list: [{name: "xxx"}, {name: "yyy"}]});
             });
 
-        function add_something(res, req, ret, next) {
+        function add_something(res, req, ret, next, error) {
             ret.response.something = "ok";
             next(ret);
         }
@@ -86,18 +83,34 @@
 
         api.get(1, "get/:id")
             .hook("add-something")
+            // define a new parameter via params(url)
             .param("id", {type: types.number, scope: "params"})
+            // define a limit that is a number, optional and if not sent 100
             .param("limit", {type: types.number, optional: true, default: 100})
-            .handler(function (req, res, next) {
+            .handler(function (req, res, success, error) {
                 console.log("#requested!", req.params, req.query);
 
                 // short way
-                next({success: true, limit: req.query.limit});
+                success({limit: req.query.limit});
             });
 
 
-        //debug: console.log(api.methods());
+    api.get(1, "docs", "display the documentation")
+        .handler(function (req, res, next, error) {
 
+            var doc = [];
+
+            api.get_uris().forEach(function (uri) {
+                doc.push(api.doc(uri));
+            });
+
+            res.setHeader("Content-Type", "text/html");
+            res.end(doc.join("<hr />\n\n\n"));
+
+            next();
+        });
+
+        //debug: console.log(api.methods());
 
         t.end();
     });
@@ -114,7 +127,11 @@
             request.get("http://localhost:8080/v1/?id=100", function (error, response, body) {
                 console.log("#output ", body);
 
+                //console.log("#res!", util.inspect(response, {depth: 0}));
+                //process.exit();
+
                 t.equal(response.statusCode, 200, "return code is 200");
+                t.equal(response.headers['content-type'], "application/json", " content-type is application/json");
                 if(response.statusCode == 200) {
                     var json = JSON.parse(body);
                     t.equal(json.success, true, "request is successful");
@@ -123,9 +140,11 @@
                 t.end();
             });
 
-        }, 1000);
+        }, req_timeout);
 
     });
+
+
     test("get:/v1/login?user=test&pwd=test", function (t) {
 
         setTimeout(function () {
@@ -133,6 +152,7 @@
                 console.log("#output ", body);
 
                 t.equal(response.statusCode, 200, "return code is 200");
+                t.equal(response.headers['content-type'], "application/json", " content-type is application/json");
                 if(response.statusCode == 200) {
                     var json = JSON.parse(body);
                     t.equal(json.success, true, "request is successful");
@@ -141,7 +161,7 @@
                 t.end();
             });
 
-        }, 1000);
+        }, req_timeout);
 
     });
 
@@ -155,6 +175,7 @@
                 console.log("#output ", body);
 
                 t.equal(response.statusCode, 200, "return code is 200");
+                t.equal(response.headers['content-type'], "application/json", " content-type is application/json");
                 if(response.statusCode == 200) {
                     var json = JSON.parse(body);
                     t.equal(json.success, true, "request is successful");
@@ -163,7 +184,7 @@
                 t.end();
             });
 
-        }, 1000);
+        }, req_timeout);
 
     });
     test("get:/v1/info (err)", function (t) {
@@ -175,11 +196,12 @@
                 console.log("#output ", body);
 
                 t.equal(response.statusCode, 401, "return code is 200");
+                t.equal(response.headers['content-type'], "application/json", " content-type is application/json");
 
                 t.end();
             });
 
-        }, 1000);
+        }, req_timeout);
 
     });
 
@@ -192,6 +214,8 @@
                 console.log("#output ", body);
 
                 t.equal(response.statusCode, 200, "return code is 200");
+                t.equal(response.headers['content-type'], "application/json", " content-type is application/json");
+
                 if(response.statusCode == 200) {
                     var json = JSON.parse(body);
                     t.equal(json.success, true, "request is successful");
@@ -203,7 +227,7 @@
                 t.end();
             });
 
-        }, 1000);
+        }, req_timeout);
 
     });
 
@@ -218,16 +242,36 @@
                 console.log("#output ", body);
 
                 t.equal(response.statusCode, 400, "return code is 200");
+                t.equal(response.headers['content-type'], "application/json", " content-type is application/json");
+
                 var json = JSON.parse(body);
                 t.equal(json.success, false, "request is unsuccessful");
 
                 t.end();
             });
 
-        }, 1000);
+        }, req_timeout);
 
     });
 
+
+    test("get:/v1/docs (err)", function (t) {
+
+        setTimeout(function () {
+            console.log("#requesting!");
+
+            request.get("http://localhost:8080/v1/docs", function (error, response, body) {
+                t.equal(response.statusCode, 200, "return code is 200");
+                t.equal(response.headers['content-type'], "text/html", " content-type is text/html");
+                //console.log(body);
+                t.equal(body.length > 1000, true, "doc length is big...");
+
+                t.end();
+            });
+
+        }, req_timeout);
+
+    });
 
     test("close", function (t) {
         server.close();

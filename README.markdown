@@ -17,7 +17,7 @@ Means that you write the API interface (parameters, hooks, and response) and Exp
 ============
 
 ``` bash
-npm install expressionist
+npm install apis-expressionist
 ```
 
 
@@ -26,7 +26,7 @@ npm install expressionist
 
 ``` js
 
-var api = require("expressionist").api,
+var api = require("apis-expressionist").api,
     types = api.types,
     express = require("express"),
     app = express();
