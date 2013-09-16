@@ -39,59 +39,78 @@ api.version_pattern = "/v{version}/{uri}";
 
 
 // login example FTW
-api.get(1, "login", "This service create a session for our api")
-    //define parameters
-    .param("user", {type: types.string, description: "Username default is the email"})
-    .param("pwd", {type: types.string, description: "Password, must be an md5, we dont want to see the password in our access log..."})
+api.get(/*version*/1, /*uri*/"", /*description*/"index")
+    // define a new parameter via query
+    .param("id", {type: types.number})
+    // this callback handle the request
+    // success or error must be called only once
+    .handler(function (req, res, success, error) {
 
-    // define response metadata
-    .response("sessionid", {type: types.string})
+        t.notEqual(req.query.id, 0, "id is not cero");
+        t.equal(req.query.id, 100, "id is 100");
 
-    // who will manager the request
-    .handler(function (req, res, next) {
-        // check credentials...
-
-        // return
-        next({
-            // http code
-            code: 200,
-            // response, will be json in the body
-            response: {success: true, sessionid: "fmsdkljfs98chsduc8w2bc"}
-        });
+        success();
     });
 
-// one you are logged, retrieve user information
-// now we introduce a new concept: Hooks
-api.define_hook("auth", check_session, null, {description: "required valid session"});
+api.get(1, "login", "This service create a session")
+    .param("user", {type: types.string, description: "username default is the email"})
+    .param("pwd", {type: types.string, description: "password for account"})
+    .param("date", {type: types.date, optional: true, description: "Current date to know the timezone"})
+    .response("sessionid", {type: types.string, description: "Session id, use it in 'Require user authentication' methods"})
+    .handler(function (req, res, success, error) {
+        console.log("#requested!", req.params, req.query);
 
-function check_session(req, res, next) {
+        t.notEqual(req.query.user, "test", "user is test");
+        t.equal(req.query.pwd, "test", "pwd is test");
+
+        success({sessionid: "fmsdkljfs98chsduc8w2bc"});
+    });
+
+function check_session(req, res, next, error) {
     if (!req.query.sessionid || req.query.sessionid != "fmsdkljfs98chsduc8w2bc") {
-        // return an error, no other Hook will be executed
-        return next({
-            code: 401,
-            response: {success: false, error: "session not found"}
-        });
+        return error(/*code*/401, /*string*/"session not found");
     }
-    // it"s ok!
-    next(true); // this means continue with the next Hook
+    // it"s ok! continue!
+    next();
 }
 
 api.define_hook("auth", check_session, null, {description: "required valid session"});
 
 api.get(1, "info")
-    .hook("auth")
+    .hook("auth") // attach the hook
+    // reference a complex type is valid for arrays and objects
     .response("list", {type: types.array, ref: ":list"})
-    .response(":list", [{
-        name: "name",
-        type: types.string
-    }])
-    .handler(function (req, res, next) {
+    // define a list of types
+    .response(":list", [
+        {name: "name", type: types.string}
+    ])
+    .handler(function (req, res, success, error) {
+        console.log("#requested!", req.params, req.query);
+
+        success({list: [{name: "xxx"}, {name: "yyy"}]});
+    });
+
+// add something to the return structure
+function add_something(res, req, ret, next, error) {
+    ret.response.something = "ok";
+    next(ret);
+}
+api.define_hook("add-something", null, add_something, {description: "add new field something"});
+
+api.get(1, "get/:what/:id")
+    .hook("add-something")
+    // define a new parameter via params(url)
+    .param("id", {type: types.number, scope: "params"})
+    .param("what", {type: types.in, values: ["food", "anything"], scope: "params"})
+    // define a limit that is a number, optional and if not sent 100
+    .param("limit", {type: types.number, optional: true, default: 100})
+
+    .handler(function (req, res, success, error) {
         console.log("#requested!", req.params, req.query);
 
         // short way
-        next({success: true, list: [{name: "xxx"}, {name: "yyy"}]});
+        success({limit: req.query.limit});
     });
-
 
 
 ```
