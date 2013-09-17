@@ -105,6 +105,9 @@
                 doc.push(api.doc(uri));
             });
 
+            //console.log(doc.join("<hr />\n\n\n"));
+            //proces.exit();
+
             res.setHeader("Content-Type", "text/html");
             res.end(doc.join("<hr />\n\n\n"));
 
