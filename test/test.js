@@ -124,7 +124,7 @@
 
         t.end();
     });
-
+/*
     test("get:/v1/?id=100", function (t) {
 
         setTimeout(function () {
@@ -276,6 +276,25 @@
         }, req_timeout);
 
     });
+*/
+    test("call:/v1/get/food/1001", function (t) {
+
+        api.call("get", "/v1/get/food/1001", {}, function(response, http_code, headers) {
+            console.log("back!!!", arguments);
+            t.equal(http_code, 200, "return code is 200");
+            t.equal(headers['content-type'], "application/json", " content-type is application/json");
+
+            if(http_code == 200) {
+                t.equal(response.success, true, "request is successful");
+                t.equal(response.something, "ok", "request is successful");
+                t.equal(response.limit, 100, "limit default value is 100");
+            }
+
+            t.end();
+        });
+
+    });
+
 
     test("close", function (t) {
         server.close();
