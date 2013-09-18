@@ -242,10 +242,10 @@
         setTimeout(function () {
             console.log("#requesting!");
 
-            request.get("http://localhost:8080/v1/get/food/hola", function (error, response, body) {
+            request.get("http://localhost:8080/v1/get/clock/hola", function (error, response, body) {
                 console.log("#output ", body);
 
-                t.equal(response.statusCode, 400, "return code is 200");
+                t.equal(response.statusCode, 500, "return code is 500");
                 t.equal(response.headers['content-type'], "application/json", " content-type is application/json");
 
                 var json = JSON.parse(body);

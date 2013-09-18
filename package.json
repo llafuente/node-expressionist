@@ -1,6 +1,6 @@
 {
   "name": "apis-expressionist",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Wrapper on top express to Write, Document and 'Create the client'™ of REST APIs",
   "main": "./index.js",
   "keywords": [
