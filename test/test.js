@@ -96,23 +96,23 @@
             });
 
 
-    api.get(1, "docs", "display the documentation")
-        .handler(function (req, res, next, error) {
+        api.get(1, "/docs", "display the documentation")
+            .handler(function (req, res, next, error) {
 
-            var doc = [];
+                var doc = [];
 
-            api.get_uris().forEach(function (uri) {
-                doc.push(api.doc(uri));
+                api.get_uris().forEach(function (uri) {
+                    doc.push(api.doc(uri));
+                });
+
+                //console.log(doc.join("<hr />\n\n\n"));
+                //proces.exit();
+
+                res.setHeader("Content-Type", "text/html");
+                res.end(doc.join("<hr />\n\n\n"));
+
+                next();
             });
-
-            //console.log(doc.join("<hr />\n\n\n"));
-            //proces.exit();
-
-            res.setHeader("Content-Type", "text/html");
-            res.end(doc.join("<hr />\n\n\n"));
-
-            next();
-        });
 
         //debug: console.log(api.methods());
 
@@ -124,7 +124,7 @@
 
         t.end();
     });
-/*
+
     test("get:/v1/?id=100", function (t) {
 
         setTimeout(function () {
@@ -259,12 +259,12 @@
     });
 
 
-    test("get:/v1/docs", function (t) {
+    test("get:/docs", function (t) {
 
         setTimeout(function () {
             console.log("#requesting!");
 
-            request.get("http://localhost:8080/v1/docs", function (error, response, body) {
+            request.get("http://localhost:8080/docs", function (error, response, body) {
                 t.equal(response.statusCode, 200, "return code is 200");
                 t.equal(response.headers['content-type'], "text/html", " content-type is text/html");
                 //console.log(body);
@@ -276,17 +276,16 @@
         }, req_timeout);
 
     });
-*/
+
     test("call:/v1/get/food/1001", function (t) {
 
-        api.call("get", "/v1/get/food/1001", {}, function(response, http_code, headers) {
+        api.call("get", "/v1/get/food/1001", {limit: 100}, function(response, http_code, headers) {
             console.log("back!!!", arguments);
             t.equal(http_code, 200, "return code is 200");
-            t.equal(headers['content-type'], "application/json", " content-type is application/json");
 
             if(http_code == 200) {
                 t.equal(response.success, true, "request is successful");
-                t.equal(response.something, "ok", "request is successful");
+                t.equal(response.something, "ok", "something is ok");
                 t.equal(response.limit, 100, "limit default value is 100");
             }
 
