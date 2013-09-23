@@ -114,7 +114,7 @@
                 next();
             });
 
-        //debug: console.log(api.methods());
+        //debug: console.log(api.get_methods());
 
         t.end();
     });
@@ -279,7 +279,7 @@
 
     test("call:/v1/get/food/1001", function (t) {
 
-        api.call("get", "/v1/get/food/1001", {limit: 100}, function(response, http_code, headers) {
+        api.call("get", "/v1/get/food/1001", {query: {limit: 100}}, function(response, http_code, headers) {
             console.log("back!!!", arguments);
             t.equal(http_code, 200, "return code is 200");
 
