@@ -1,0 +1,45 @@
+sessionHook:
+    type: requestHook
+    target: session.js:preHook
+
+authHook:
+    type: requestHook
+    target: auth.js:preHook
+
+jsonHook:
+    type: responseHook
+    target: response.js:toJSON
+
+users-login:
+    type: uri
+    methods: [POST]
+    uri: /users/login
+    version: 1
+    # hook list
+    requestHooks:
+        - sessionHook
+    responsetHooks:
+
+    params: #url
+    get: # GET
+    post: # POST
+        username:
+            cast: string
+            length: [4, 32]
+        password:
+            cast: string
+            length: [4, 32]
+
+    handler: users.js:login
+
+
+users-session:
+    type: uri
+    methods: [GET]
+    uri: /users/session
+    version: 1
+    requestHooks:
+        - sessionHook
+        - authHook
+
+    handler: users.js:session

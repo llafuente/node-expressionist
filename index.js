@@ -3,6 +3,5 @@
 
     require("object-enhancements");
 
-    module.exports.api = require("./lib/api.js").api;
-
+    module.exports = require("./lib/expresionist.js");
 }());
