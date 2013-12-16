@@ -1,4 +1,12 @@
 module.exports = {
-    login: function(req, res, success, error) {},
-    session: function(req, res, success, error) {}
+    login: function(req, res, next) {
+        if (req.body.username === "test" && req.body.password === "test") {
+            res.setResonse({success: true});
+        }
+
+        next();
+    },
+    session: function(req, res, next) {
+        next();
+    }
 };

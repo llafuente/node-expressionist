@@ -1,4 +1,5 @@
 module.exports = {
-    toJSON: function(ret, req, res, next, error) {
+    toJSON: function(req, res, next) {
+        next();
     }
 };

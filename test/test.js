@@ -29,9 +29,24 @@
         });
     });
 
-    test("call /users/login without parametes", function(t) {
+    test("call /users/login without parameters", function(t) {
         expresionist.call("/users/login", "post", {}, function(response) {
+            console.log("/users/login", response);
+            t.equal(response.errors !== undefined, true, "has errors");
+            t.equal(response.errors.length, 2, "two errors in particular");
+            t.end();
+        });
+    });
+
+    test("call /users/login with parameters", function(t) {
+        expresionist.call("/users/login", "post", {
+            body: {
+                username: "test",
+                password: "test"
+            }
+        }, function(response) {
             console.log("WTF!", response);
+
             t.end();
         });
     });
