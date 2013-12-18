@@ -25,10 +25,16 @@ users-login:
     post: # POST
         username:
             cast: string
-            length: [4, 32]
+            constraints:
+                length: [4, 32]
         password:
             cast: string
-            length: [4, 32]
+            constraints:
+                length: [4, 32]
+        timestamp:
+            cast: int
+            constraints:
+                int:
 
     handler: users.js:login
 
