@@ -8,5 +8,10 @@ module.exports = {
     },
     session: function(req, res, next) {
         next();
+    },
+    ret_get: function(req, res, next) {
+    	req.query.success = true;
+    	res.setResponse(req.query);
+    	next();
     }
 };

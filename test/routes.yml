@@ -1,6 +1,64 @@
+#
+# Documentation
+#
+username:
+    type: docParam
+    # this is not necesary but could be usefull in large files to avoid naming collisions
+    name: username
+    doc: >
+        This comment will be used if no
+        other comment is defined for a parameter named
+        username
+
+# this is the documentation of a single URI-METHOD pair.
+# we support many method in the definition, we are sure that
+# they don't do the same
+uri-get:
+    type: docURI
+    uri: /user/:id
+    method: GET
+    doc: >
+        Retrieve user information
+
+uri-post:
+    type: docURI
+    uri: /user/:id
+    method: POST
+    doc: |+
+        Modify user information
+#
+# Parameters
+#
+
+user-type:
+    type: type
+    # this is not necesary but could be usefull in large files to avoid naming collisions
+    name: user-type
+    cast: object
+    object:
+        name:
+            cast: string
+            constraints:
+                length: [4, 32]
+        password:
+            cast: string
+            constraints:
+                length: [4, 32]
+
+#
+# Hooks
+#
+
 sessionHook:
     type: requestHook
     target: session.js:preHook
+    doc: |+
+        This is a multiline comment, just
+        to remember that this is possible in
+        YML :)
+        
+        It's recommended to user pipe-plus because
+        we replace new lines with BR
 
 authHook:
     type: requestHook
@@ -10,12 +68,67 @@ jsonHook:
     type: responseHook
     target: response.js:toJSON
 
+#
+# URIs
+#
+test-date:
+    type: uri
+    methods: [GET]
+    uri: /test/date
+    handler: users.js:ret_get
+    get: # GET
+        date:
+            cast: date
+            constraints:
+                date:
+
+test-object-param:
+    type: uri
+    methods: [GET]
+    uri: /test/object-param
+    handler: users.js:ret_get
+    get: # GET
+        user:
+            cast: object
+            object:
+                name:
+                    cast: string
+                    constraints:
+                        length: [1, 32]
+                surname:
+                    cast: string
+                    constraints:
+                        length: [1, 32]
+
+user-type: &id001
+    name:
+        cast: string
+        constraints:
+            length: [1, 32]
+    surname:
+        cast: string
+        constraints:
+            length: [1, 32]
+
+
+test-object-param2:
+    type: uri
+    methods: [GET]
+    uri: /test/object-param2
+    handler: users.js:ret_get
+    get: # GET
+        user:
+            cast: object
+            object:
+                *id001
+
 users-login:
     type: uri
     methods: [POST]
     uri: /users/login
     version: 1
     # hook list
+    requestHooksPolicy: STOP_ON_ERROR | IGNORE_ERRORS
     requestHooks:
         - sessionHook
     responsetHooks:
@@ -28,16 +141,54 @@ users-login:
             constraints:
                 length: [4, 32]
         password:
+            doc: login password
             cast: string
             constraints:
                 length: [4, 32]
         timestamp:
+            doc: current timestamp just a dummy parameter to test casting
             cast: int
             constraints:
                 int:
 
     handler: users.js:login
 
+users-login2:
+    type: uri
+    methods: [POST]
+    uri: /users/login2
+    version: 1
+    # hook list
+    requestHooksPolicy: STOP_ON_ERROR | IGNORE_ERRORS
+    requestHooks:
+        - sessionHook
+    responsetHooks:
+
+    params: #url
+    get: # GET
+    post: # POST
+        ar_int_data:
+            cast: array
+            constraints:
+            each:
+                cast: string
+        user:
+            cast: reference
+            name: user-type
+        timestamp:
+            cast: int
+            constraints:
+                int:
+
+
+    # this will take in the following order
+    # params, get and post in a single array
+    # before the req parameter you will get every parameter
+    # in this example handler must be: function(username, password, timestamp, req, res, next)
+    # arguments length checked to keep consistency between changes.
+    # FUTURE: force arguments names to be the same
+    handlerArguments: EXPANDED | DEFAULT
+    handler: users.js:login
 
 users-session:
     type: uri
