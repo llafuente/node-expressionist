@@ -100,6 +100,7 @@ test-object-param:
                     constraints:
                         length: [1, 32]
 
+#link
 user-type: &id001
     name:
         cast: string
@@ -122,13 +123,29 @@ test-object-param2:
             object:
                 *id001
 
+
+test-continue-on-error:
+    type: uri
+    methods: [GET]
+    uri: /test/continue-on-error
+    handler: users.js:ret_get
+    requestHooksPolicy: CONTINUE_ON_ERROR
+    requestHooks:
+        - sessionHook
+        - authHook
+    get: # GET
+        do_not_send_me:
+            cast: string
+            constraints:
+                length: [1, 32]
+
 users-login:
     type: uri
     methods: [POST]
     uri: /users/login
     version: 1
     # hook list
-    requestHooksPolicy: STOP_ON_ERROR | IGNORE_ERRORS
+    requestHooksPolicy: STOP_ON_ERROR | CONTINUE_ON_ERROR
     requestHooks:
         - sessionHook
     responsetHooks:
