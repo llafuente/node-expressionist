@@ -12,8 +12,10 @@
         request = require("request"),
         req_timeout = 250,
 
-
         exit = process.exit;
+
+    app.use(express.cookieParser('no-more-secrets'));
+    app.use(express.bodyParser());
 
     test("init and attach", function (t) {
         expresionist = new Expresionist();
@@ -26,7 +28,7 @@
 
     test("load YML", function (t) {
         expresionist.loadYML("routes.yml", function () {
-            t.equal(Object.keys(expresionist.uris.get).length, 4, "number of get uris");
+            t.equal(Object.keys(expresionist.uris.get).length, 5, "number of get uris");
             t.equal(Object.keys(expresionist.uris.post).length, 2, "number of post uris");
             t.equal(Object.keys(expresionist.uris.put).length, 0, "number of put uris");
             t.equal(Object.keys(expresionist.uris["delete"]).length, 0, "number of delete uris");
@@ -105,8 +107,6 @@
                 }
             }
         }, function (response) {
-            console.log("WTF!", response);
-
             t.equal(response.success, false, "KO");
             t.equal(response.errors.length, 1, "1 error");
             t.equal(response.errors[0].long_message, "[surname] is undefined", "[surname] is undefined");
@@ -125,8 +125,6 @@
                 }
             }
         }, function (response) {
-            console.log("WTF!", response);
-
             t.equal(response.success, false, "KO");
             t.equal(response.errors.length, 1, "1 error");
             t.equal(response.errors[0].message, "constraint [length] fail for [surname]", "constraint [length] fail for [surname]");
@@ -145,8 +143,6 @@
                 }
             }
         }, function (response) {
-            console.log("WTF!", response);
-
             t.equal(response.success, true, "OK");
 
             t.end();
@@ -163,8 +159,6 @@
                 }
             }
         }, function (response) {
-            console.log("WTF!", response);
-
             t.equal(response.success, false, "KO");
             t.equal(response.errors.length, 1, "1 error");
             t.equal(response.errors[0].message, "constraint [length] fail for [surname]", "constraint [length] fail for [surname]");
@@ -172,6 +166,23 @@
             t.end();
         });
     });
+
+    test("call /test/continue-on-error return many errors", function (t) {
+
+        expresionist.call("/test/continue-on-error", "get", {
+            // do not send cookies, auth will fail
+        }, function (response) {
+
+
+            t.equal(response.success, false, "KO");
+            t.equal(response.errors.length, 2, "1 error");
+            t.equal(response.errors[0].message, "invalid-input");
+            t.equal(response.errors[1].message, "invalid-auth");
+
+            t.end();
+        });
+    });
+
 
 
     test("listen", function (t) {
