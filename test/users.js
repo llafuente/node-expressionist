@@ -1,7 +1,7 @@
 module.exports = {
     login: function(req, res, next) {
         if (req.body.username === "test" && req.body.password === "test") {
-            res.setResonse({success: true});
+            res.setResponse({success: true});
         }
 
         next();
