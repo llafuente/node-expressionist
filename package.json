@@ -31,7 +31,8 @@
     "express" : "*",
     "js-yaml" : "*",
     "validator" : "*",
-    "object-enhancements" : "*"
+    "object-enhancements" : "*",
+    "array-enhancements" : "*"
   },
   "devDependencies": {
     "tap" : "~0.2.5",

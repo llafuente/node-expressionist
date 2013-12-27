@@ -28,7 +28,7 @@
 
     test("load YML", function (t) {
         expresionist.loadYML("routes.yml", function () {
-            t.equal(Object.keys(expresionist.uris.get).length, 5, "number of get uris");
+            t.equal(Object.keys(expresionist.uris.get).length, 8, "number of get uris");
             t.equal(Object.keys(expresionist.uris.post).length, 2, "number of post uris");
             t.equal(Object.keys(expresionist.uris.put).length, 0, "number of put uris");
             t.equal(Object.keys(expresionist.uris["delete"]).length, 0, "number of delete uris");
@@ -60,9 +60,11 @@
         expresionist.call("/users/login", "post", {
             body: {
                 username: "test",
-                password: "test"
+                password: "test",
+                timestamp: "0"
             }
         }, function (response) {
+            t.equal(response.success, true, "OK!");
             t.end();
         });
     });
@@ -75,7 +77,8 @@
         }, function (response) {
             t.equal(response.success, false, "KO");
             t.equal(response.errors.length, 1, "1 error");
-            t.equal(response.errors[0].message, "constraint [date] fail for [date]", "constraint [date] fail for [date]");
+            t.equal(response.errors[0].message, "invalid-input");
+            t.equal(response.errors[0].long_message, "constraint [date] fail for [date]", "constraint [date] fail for [date]");
 
             t.end();
         });
@@ -127,7 +130,8 @@
         }, function (response) {
             t.equal(response.success, false, "KO");
             t.equal(response.errors.length, 1, "1 error");
-            t.equal(response.errors[0].message, "constraint [length] fail for [surname]", "constraint [length] fail for [surname]");
+            t.equal(response.errors[0].message, "invalid-input");
+            t.equal(response.errors[0].long_message, "constraint [length] fail for [surname]", "constraint [length] fail for [surname]");
 
             t.end();
         });
@@ -161,7 +165,8 @@
         }, function (response) {
             t.equal(response.success, false, "KO");
             t.equal(response.errors.length, 1, "1 error");
-            t.equal(response.errors[0].message, "constraint [length] fail for [surname]", "constraint [length] fail for [surname]");
+            t.equal(response.errors[0].message, "invalid-input");
+            t.equal(response.errors[0].long_message, "constraint [length] fail for [surname]", "constraint [length] fail for [surname]");
 
             t.end();
         });
@@ -183,7 +188,52 @@
         });
     });
 
+    test("call /date-diff", function (t) {
 
+        expresionist.call("/date-diff", "get", {
+            // do not send cookies, auth will fail
+            query: {
+                date: "2013-01-01 12:00:00"
+            }
+        }, function (response) {
+            t.equal(response.success, true, "success!");
+            t.equal(response.diff, -3600000, "-1hour (ms)");
+
+
+            t.end();
+        });
+    });
+
+    test("call /server-date", function (t) {
+
+        expresionist.call("/server-date", "get", {
+        }, function (response) {
+
+            t.equal(response.success, true, "success!");
+            t.equal(response.date.getTime(), (new Date("2013-01-01 13:00:00")).getTime(), "");
+
+
+            t.end();
+        });
+    });
+
+    test("call /server-bad-date", function (t) {
+
+        expresionist.call("/server-bad-date", "get", {
+        }, function (response) {
+
+            t.equal(response.success, false, "success!");
+            t.equal(response.errors[0].message, "invalid-output", "invalid-input message");
+
+            t.end();
+        });
+    });
+
+    test("generate documentation", function (t) {
+
+        expresionist.exportDoc("doc.html");
+        t.end();
+    });
 
     test("listen", function (t) {
         server = expresionist.listen(8081);
