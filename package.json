@@ -1,6 +1,6 @@
 {
   "name": "apis-expressionist",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Expresionist.wrapper(express).for(['Write', 'Document', 'Generate client']).of('REST APIs')",
   "main": "./index.js",
   "keywords": [

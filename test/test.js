@@ -240,11 +240,9 @@
                 }
         }, function (response) {
 
-            console.log(response);
-            process.exit();
-
-            t.equal(response.success, false, "success!");
-            t.equal(response.errors[0].message, "invalid-output", "invalid-input message");
+            t.equal(response.success, true, "success!");
+            t.equal(response.username, "user-test", "username is the given one");
+            t.equal(response.password, "pwd-test", "password is the given one");
 
             t.end();
         });
