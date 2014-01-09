@@ -1,7 +1,7 @@
 {
   "name": "apis-expressionist",
-  "version": "0.0.8",
-  "description": "Wrapper on top express to Write, Document and 'Create the client'™ of REST APIs",
+  "version": "0.0.9",
+  "description": "Expresionist.wrapper(express).for(['Write', 'Document', 'Generate client']).of('REST APIs')",
   "main": "./index.js",
   "keywords": [
     "api",
@@ -12,7 +12,7 @@
     "test": "test"
   },
   "scripts" : {
-    "test" : "tap test/*.js"
+    "test" : "tap test/test*.js"
   },
   "repository": {
     "type": "git",
@@ -29,8 +29,10 @@
   },
   "dependencies" : {
     "express" : "*",
+    "js-yaml" : "*",
+    "validator" : "*",
     "object-enhancements" : "*",
-    "validator" : "*"
+    "array-enhancements" : "*"
   },
   "devDependencies": {
     "tap" : "~0.2.5",

@@ -4,296 +4,262 @@
     var tap = require("tap"),
         util = require("util"),
         test = tap.test,
-        api = require("../index.js").api,
-        types = api.types,
+        Expresionist = require("../index.js"),
+        expresionist,
         express = require("express"),
         app = express(),
-        request = require("request"),
         server,
-        req_timeout = 250;
+        request = require("request"),
+        req_timeout = 250,
 
-    test("init api", function (t) {
-        api = api(app);
+        exit = process.exit;
+
+    app.use(express.cookieParser('no-more-secrets'));
+    app.use(express.bodyParser());
+
+    test("init and attach", function (t) {
+        expresionist = new Expresionist();
+        expresionist.rootDir = __dirname;
+        expresionist.attach(app);
+        t.equal(expresionist.app, app, "app ready!");
+
         t.end();
     });
 
+    test("load YML", function (t) {
+        expresionist.loadYML("routes.yml", function () {
+            t.equal(Object.keys(expresionist.uris.get).length, 8, "number of get uris");
+            t.equal(Object.keys(expresionist.uris.post).length, 2, "number of post uris");
+            t.equal(Object.keys(expresionist.uris.put).length, 0, "number of put uris");
+            t.equal(Object.keys(expresionist.uris["delete"]).length, 0, "number of delete uris");
+            t.end();
+        });
+    });
 
-    test("init get", function (t) {
-        // remember to setup your own url
-        api.version_pattern = "/v{version}/{uri}";
+    test("call /users/login without parameters", function (t) {
+        expresionist.call("/users/login", "post", {}, function (response) {
+            t.equal(response.errors !== undefined, true, "has errors");
+            t.equal(response.errors.length, 3, "three errors in particular");
+            t.end();
+        });
+    });
 
-        api.get(/*version*/1, /*uri*/"", /*description*/"index")
-            // define a new parameter via query
-            .param("id", {type: types.number})
-            // this callback handle the request
-            // success or error must be called only once
-            .handler(function (req, res, success, error) {
-
-                t.notEqual(req.query.id, 0, "id is not cero");
-                t.equal(req.query.id, 100, "id is 100");
-
-                success();
-            });
-
-        api.get(1, "login", "This service create a session")
-            .param("user", {type: types.string, description: "username default is the email"})
-            .param("pwd", {type: types.string, description: "password for account"})
-            .param("date", {type: types.date, optional: true, description: "Current date to know the timezone"})
-            .response("sessionid", {type: types.string, description: "Session id, use it in 'Require user authentication' methods"})
-            .handler(function (req, res, success, error) {
-                console.log("#requested!", req.params, req.query);
-
-                t.notEqual(req.query.user, "test", "user is test");
-                t.equal(req.query.pwd, "test", "pwd is test");
-
-                success({sessionid: "fmsdkljfs98chsduc8w2bc"});
-            });
-
-        function check_session(req, res, next, error) {
-            if (!req.query.sessionid || req.query.sessionid != "fmsdkljfs98chsduc8w2bc") {
-                return error(/*code*/401, /*string*/"session not found");
+    test("call /users/login with invalid parameters", function (t) {
+        expresionist.call("/users/login", "post", {
+            body: {
+                username: "t",
+                password: "t168165d1f6sd8f1sd68f1sd6f8ds4f16s841s6df51sd6f8sd1f6d5f16s8d4f16sd51fd6s546464t168165d1f6sd8f1sd68f1sd6f8ds4f16s841s6df51sd6f8sd1f6d5f16s8d4f16sd51fd6s546464",
+                timestamp: "4635618"
             }
-            // it"s ok! continue!
-            next();
-        }
+        }, function (response) {
+            t.end();
+        });
+    });
 
-        api.define_hook("auth", check_session, null, {description: "required valid session"});
+    test("call /users/login with parameters", function (t) {
+        expresionist.call("/users/login", "post", {
+            body: {
+                username: "test",
+                password: "test",
+                timestamp: "0"
+            }
+        }, function (response) {
+            t.equal(response.success, true, "OK!");
+            t.end();
+        });
+    });
 
-        api.get(1, "info")
-            .hook("auth") // attach the hook
-            // reference a complex type is valid for arrays and objects
-            .response("list", {type: types.array, ref: ":list"})
-            // define a list of types
-            .response(":list", [
-                {name: "name", type: types.string}
-            ])
-            .handler(function (req, res, success, error) {
-                console.log("#requested!", req.params, req.query);
+    test("call /test/date invalid date", function (t) {
+        expresionist.call("/test/date", "get", {
+            query: {
+                date: "2000-12-35"
+            }
+        }, function (response) {
+            t.equal(response.success, false, "KO");
+            t.equal(response.errors.length, 1, "1 error");
+            t.equal(response.errors[0].message, "invalid-input");
+            t.equal(response.errors[0].long_message, "constraint [date] fail for [date]", "constraint [date] fail for [date]");
 
-                success({list: [{name: "xxx"}, {name: "yyy"}]});
-            });
+            t.end();
+        });
+    });
 
-        // add something to the return structure
-        function add_something(res, req, ret, next, error) {
-            ret.response.something = "ok";
-            next(ret);
-        }
-        api.define_hook("add-something", null, add_something, {description: "add new field something"});
+    test("call /test/date invalid date", function (t) {
+        var tdate = "2000-12-01",
+            ddate = new Date(tdate);
+        expresionist.call("/test/date", "get", {
+            query: {
+                date: tdate
+            }
+        }, function (response) {
+            t.equal(response.success, true, "KO");
+            t.equal(ddate.toString(), response.date.toString(), "1 error");
 
-        api.get(1, "get/:what/:id")
-            .hook("add-something")
-            // define a new parameter via params(url)
-            .param("id", {type: types.number, scope: "params"})
-            .param("what", {type: types.in, values: ["food", "anything"], scope: "params"})
-            // define a limit that is a number, optional and if not sent 100
-            .param("limit", {type: types.number, optional: true, default: 100})
-
-            .handler(function (req, res, success, error) {
-                console.log("#requested!", req.params, req.query);
-
-                // short way
-                success({limit: req.query.limit});
-            });
+            t.end();
+        });
+    });
 
 
-        api.get(1, "/docs", "display the documentation")
-            .handler(function (req, res, next, error) {
 
-                var doc = [];
+    test("call /test/object-param error input", function (t) {
 
-                api.get_uris().forEach(function (uri) {
-                    doc.push(api.doc(uri));
-                });
+        expresionist.call("/test/object-param", "get", {
+            query: {
+                user: {
+                    name: "peter"
+                }
+            }
+        }, function (response) {
+            t.equal(response.success, false, "KO");
+            t.equal(response.errors.length, 1, "1 error");
+            t.equal(response.errors[0].long_message, "[surname] is undefined", "[surname] is undefined");
 
-                //console.log(doc.join("<hr />\n\n\n"));
-                //proces.exit();
+            t.end();
+        });
+    });
 
-                res.setHeader("Content-Type", "text/html");
-                res.end(doc.join("<hr />\n\n\n"));
+    test("call /test/object-param error input", function (t) {
 
-                next();
-            });
+        expresionist.call("/test/object-param", "get", {
+            query: {
+                user: {
+                    name: "peter",
+                    surname: ""
+                }
+            }
+        }, function (response) {
+            t.equal(response.success, false, "KO");
+            t.equal(response.errors.length, 1, "1 error");
+            t.equal(response.errors[0].message, "invalid-input");
+            t.equal(response.errors[0].long_message, "constraint [length] fail for [surname]", "constraint [length] fail for [surname]");
 
-        //debug: console.log(api.get_methods());
+            t.end();
+        });
+    });
 
+    test("call /test/object-param error input", function (t) {
+
+        expresionist.call("/test/object-param", "get", {
+            query: {
+                user: {
+                    name: "peter",
+                    surname: "lawford"
+                }
+            }
+        }, function (response) {
+            t.equal(response.success, true, "OK");
+
+            t.end();
+        });
+    });
+
+    test("call /test/object-param2 (reference type) error input", function (t) {
+
+        expresionist.call("/test/object-param2", "get", {
+            query: {
+                user: {
+                    name: "peter",
+                    surname: ""
+                }
+            }
+        }, function (response) {
+            t.equal(response.success, false, "KO");
+            t.equal(response.errors.length, 1, "1 error");
+            t.equal(response.errors[0].message, "invalid-input");
+            t.equal(response.errors[0].long_message, "constraint [length] fail for [surname]", "constraint [length] fail for [surname]");
+
+            t.end();
+        });
+    });
+
+    test("call /test/continue-on-error return many errors", function (t) {
+
+        expresionist.call("/test/continue-on-error", "get", {
+            // do not send cookies, auth will fail
+        }, function (response) {
+
+
+            t.equal(response.success, false, "KO");
+            t.equal(response.errors.length, 2, "1 error");
+            t.equal(response.errors[0].message, "invalid-input");
+            t.equal(response.errors[1].message, "invalid-auth");
+
+            t.end();
+        });
+    });
+
+    test("call /date-diff", function (t) {
+
+        expresionist.call("/date-diff", "get", {
+            // do not send cookies, auth will fail
+            query: {
+                date: "2013-01-01 12:00:00"
+            }
+        }, function (response) {
+            t.equal(response.success, true, "success!");
+            t.equal(response.diff, -3600000, "-1hour (ms)");
+
+
+            t.end();
+        });
+    });
+
+    test("call /server-date", function (t) {
+
+        expresionist.call("/server-date", "get", {
+        }, function (response) {
+
+            t.equal(response.success, true, "success!");
+            t.equal(response.date.getTime(), (new Date("2013-01-01 13:00:00")).getTime(), "");
+
+
+            t.end();
+        });
+    });
+
+    test("call /server-bad-date", function (t) {
+
+        expresionist.call("/server-bad-date", "get", {
+        }, function (response) {
+
+            t.equal(response.success, false, "success!");
+            t.equal(response.errors[0].message, "invalid-output", "invalid-input message");
+
+            t.end();
+        });
+    });
+
+    test("call /users/login-alt", function (t) {
+
+        expresionist.call("/users/login-alt", "post", {
+                query: {
+                    username: "user-test"
+                },
+                body: {
+                    password: "pwd-test"
+                }
+        }, function (response) {
+
+            t.equal(response.success, true, "success!");
+            t.equal(response.username, "user-test", "username is the given one");
+            t.equal(response.password, "pwd-test", "password is the given one");
+
+            t.end();
+        });
+    });
+
+
+
+    test("generate documentation", function (t) {
+
+        expresionist.exportDoc("doc.html");
         t.end();
     });
 
     test("listen", function (t) {
-        server = app.listen(8080);
-
+        server = expresionist.listen(8081);
         t.end();
     });
-
-    test("get:/v1/?id=100", function (t) {
-
-        setTimeout(function () {
-            request.get("http://localhost:8080/v1/?id=100", function (error, response, body) {
-                console.log("#output ", body);
-
-                //console.log("#res!", util.inspect(response, {depth: 0}));
-                //process.exit();
-
-                t.equal(response.statusCode, 200, "return code is 200");
-                t.equal(response.headers['content-type'], "application/json", " content-type is application/json");
-                if(response.statusCode == 200) {
-                    var json = JSON.parse(body);
-                    t.equal(json.success, true, "request is successful");
-                }
-
-                t.end();
-            });
-
-        }, req_timeout);
-
-    });
-
-
-    test("get:/v1/login?user=test&pwd=test", function (t) {
-
-        setTimeout(function () {
-            request.get("http://localhost:8080/v1/login?user=test&pwd=test", function (error, response, body) {
-                console.log("#output ", body);
-
-                t.equal(response.statusCode, 200, "return code is 200");
-                t.equal(response.headers['content-type'], "application/json", " content-type is application/json");
-                if(response.statusCode == 200) {
-                    var json = JSON.parse(body);
-                    t.equal(json.success, true, "request is successful");
-                }
-
-                t.end();
-            });
-
-        }, req_timeout);
-
-    });
-
-
-    test("get:/v1/info?sessionid=fmsdkljfs98chsduc8w2bc", function (t) {
-
-        setTimeout(function () {
-            console.log("#requesting!");
-
-            request.get("http://localhost:8080/v1/info?sessionid=fmsdkljfs98chsduc8w2bc", function (error, response, body) {
-                console.log("#output ", body);
-
-                t.equal(response.statusCode, 200, "return code is 200");
-                t.equal(response.headers['content-type'], "application/json", " content-type is application/json");
-                if(response.statusCode == 200) {
-                    var json = JSON.parse(body);
-                    t.equal(json.success, true, "request is successful");
-                }
-
-                t.end();
-            });
-
-        }, req_timeout);
-
-    });
-    test("get:/v1/info (err)", function (t) {
-
-        setTimeout(function () {
-            console.log("#requesting!");
-
-            request.get("http://localhost:8080/v1/info", function (error, response, body) {
-                console.log("#output ", body);
-
-                t.equal(response.statusCode, 401, "return code is 200");
-                t.equal(response.headers['content-type'], "application/json", " content-type is application/json");
-
-                t.end();
-            });
-
-        }, req_timeout);
-
-    });
-
-    test("get:/v1/get/food/1001", function (t) {
-
-        setTimeout(function () {
-            console.log("#requesting!");
-
-            request.get("http://localhost:8080/v1/get/food/1001", function (error, response, body) {
-                console.log("#output ", body);
-
-                t.equal(response.statusCode, 200, "return code is 200");
-                t.equal(response.headers['content-type'], "application/json", " content-type is application/json");
-
-                if(response.statusCode == 200) {
-                    var json = JSON.parse(body);
-                    t.equal(json.success, true, "request is successful");
-                    t.equal(json.something, "ok", "request is successful");
-                    t.equal(json.limit, 100, "limit default value is 100");
-                }
-
-
-                t.end();
-            });
-
-        }, req_timeout);
-
-    });
-
-
-
-    test("get:/v1/get/food/hola (err)", function (t) {
-
-        setTimeout(function () {
-            console.log("#requesting!");
-
-            request.get("http://localhost:8080/v1/get/clock/hola", function (error, response, body) {
-                console.log("#output ", body);
-
-                t.equal(response.statusCode, 500, "return code is 500");
-                t.equal(response.headers['content-type'], "application/json", " content-type is application/json");
-
-                var json = JSON.parse(body);
-                t.equal(json.success, false, "request is unsuccessful");
-
-                t.end();
-            });
-
-        }, req_timeout);
-
-    });
-
-
-    test("get:/docs", function (t) {
-
-        setTimeout(function () {
-            console.log("#requesting!");
-
-            request.get("http://localhost:8080/docs", function (error, response, body) {
-                t.equal(response.statusCode, 200, "return code is 200");
-                t.equal(response.headers['content-type'], "text/html", " content-type is text/html");
-                //console.log(body);
-                t.equal(body.length > 1000, true, "doc length is big...");
-
-                t.end();
-            });
-
-        }, req_timeout);
-
-    });
-
-    test("call:/v1/get/food/1001", function (t) {
-
-        api.call("get", "/v1/get/food/1001", {query: {limit: 100}}, function(response, http_code, headers) {
-            console.log("back!!!", arguments);
-            t.equal(http_code, 200, "return code is 200");
-
-            if(http_code == 200) {
-                t.equal(response.success, true, "request is successful");
-                t.equal(response.something, "ok", "something is ok");
-                t.equal(response.limit, 100, "limit default value is 100");
-            }
-
-            t.end();
-        });
-
-    });
-
 
     test("close", function (t) {
         server.close();

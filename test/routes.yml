@@ -1,0 +1,298 @@
+#
+# TODO
+#
+# responseFilterParam: xxxx
+# filter an object as white list
+# {id: 1, name: {first: "pepe", last: "Gonzalez"}, age: 18 }
+# id,name.first
+# {id: 1, name: {first: "pepe"} }
+#
+# USAGE: read, create, update, delete, other
+# this could help you to setup default response status for example
+# cache, hooks, etc...
+
+#
+#    X-Rate-Limit-Limit - The number of allowed requests in the current period
+#    X-Rate-Limit-Remaining - The number of remaining requests in the current period
+#    X-Rate-Limit-Reset - The number of seconds left in the current period
+#
+
+
+
+
+#
+# Documentation
+#
+username:
+    type: docParam
+    # this is not necesary but could be usefull in large files to avoid naming collisions
+    name: username
+    doc: >
+        This comment will be used if no
+        other comment is defined for a parameter named
+        username
+
+# this is the documentation of a single URI-METHOD pair.
+# we support many method in the definition, we are sure that
+# they don't do the same
+uri-user-get:
+    type: docURI
+    uri: /user/:id
+    method: GET
+    doc: >
+        Retrieve user information
+    example: http://www.apitest.com/user/1
+
+uri-user-post:
+    type: docURI
+    uri: /user/:id
+    method: POST
+    doc: |+
+        Modify user information
+# Everything will be sent using the proper method, POST and que query string in the body
+    example: http://www.apitest.com/user/1?age=1999-01-01
+#
+# Parameters
+#
+
+#
+# Hooks
+#
+
+session-hook:
+    type: requestHook
+    target: session.js:preHook
+    doc: |+
+        Create a session if needed
+
+auth-hook:
+    type: requestHook
+    target: auth.js:preHook
+    doc: >
+        Require Authetication
+
+json-hook:
+    type: responseHook
+    target: response.js:toJSON
+    doc: >
+        Transform response object to JSON
+
+#
+# URIs
+#
+test-date:
+    type: uri
+    methods: [GET]
+    uri: /test/date
+    doc: >
+        Method that returns given date.
+
+    handler: users.js:ret_get
+    get: # GET
+        date:
+            cast: date
+            constraints:
+                date:
+
+
+test-object-param:
+    type: uri
+    methods: [GET]
+    uri: /test/object-param
+    doc: >
+        Method to test request objects structure/validation and casting
+
+    handler: users.js:ret_get
+    get: # GET
+        user:
+            cast: object
+            object:
+                name:
+                    cast: string
+                    constraints:
+                        length: [1, 32]
+                surname:
+                    cast: string
+                    constraints:
+                        length: [1, 32]
+                optional-sub:
+                    cast: object
+                    constraints:
+                        optional:
+                        length: [4, 32]
+                    object:
+                        deep-enought:
+                            case: boolean
+
+#link
+user-type: &id001
+    name:
+        cast: string
+        constraints:
+            length: [1, 32]
+    surname:
+        cast: string
+        constraints:
+            length: [1, 32]
+
+
+test-object-param2:
+    type: uri
+    methods: [GET]
+    uri: /test/object-param2
+    handler: users.js:ret_get
+    get: # GET
+        user:
+            cast: object
+            object:
+                *id001
+
+
+test-continue-on-error:
+    type: uri
+    methods: [GET]
+    uri: /test/continue-on-error
+    doc: >
+        Test requestHooksPolicy CONTINUE_ON_ERROR.
+        The parameter "do_not_send_me" wont be sent but session-hook and auth-hook will be called
+
+    handler: users.js:ret_get
+    requestHooksPolicy: CONTINUE_ON_ERROR
+    requestHooks:
+        - session-hook
+        - auth-hook
+    get: # GET
+        do_not_send_me:
+            cast: string
+            constraints:
+                length: [1, 32]
+
+users-login:
+    type: uri
+    methods: [POST]
+    uri: /users/login
+    version: 1
+    # hook list
+    requestHooks:
+        - session-hook
+
+    post:
+        username:
+            cast: string
+            constraints:
+                length: [4, 32]
+        password:
+            doc: login password
+            cast: string
+            constraints:
+                length: [4, 32]
+        timestamp:
+            doc: current timestamp just a dummy parameter to test casting
+            cast: int
+            constraints:
+                int:
+
+    handler: users.js:login
+
+
+get-date-diff: # This is the ID, must be unique, only the last one prevail
+    type: uri # Type of object, you can define more than just URIs...
+    methods: [GET] #suported methods GET|POST|PUT|DELETE, if you extend express you can use more...
+    uri: /date-diff
+    doc: >
+        Get the date difference between given and the server.
+    handler: date.js:diff
+    get: # GET data validation
+        date:
+            cast: date
+            doc: current client date
+            constraints:
+                date:
+    response:
+        diff:
+            cast: int
+
+
+get-server-date: # This is the ID, must be unique, only the last one prevail
+    type: uri # Type of object, you can define more than just URIs...
+    methods: [GET] #suported methods GET|POST|PUT|DELETE, if you extend express you can use more...
+    uri: /server-date
+    doc: >
+        Get the date difference between given and the server.
+    handler: date.js:server
+
+    response: # GET data validation
+        date:
+            doc: current server date
+            constraints:
+                date:
+
+get-bad-server-date: # This is the ID, must be unique, only the last one prevail
+    type: uri # Type of object, you can define more than just URIs...
+    methods: [GET] #suported methods GET|POST|PUT|DELETE, if you extend express you can use more...
+    uri: /server-bad-date
+    doc: >
+        Get the date difference between given and the server.
+    handler: date.js:server
+
+    response: # GET data validation
+        date:
+            doc: current server date
+            cast: date
+            constraints:
+                date:
+        give-me-an-error:
+            doc: This parameter don't exists in response for test purposes
+
+
+users-login-alt:
+    type: uri
+    methods: [POST]
+    uri: /users/login-alt
+
+    params: #url
+    get: # GET
+        username:
+            case: string
+
+    post: # POST
+        password:
+            cast: string
+
+
+    # this will take in the following order
+    # params, get and post in a single array
+    # before the req parameter you will get every parameter
+    # in this example handler must be: function(username, password, timestamp, req, res, next)
+    # arguments length checked to keep consistency between changes.
+    # FUTURE: force arguments names to be the same
+    handlerArguments: EXPAND
+    #handlerArgumentsOrder:
+    handler: users.js:login_alt
+
+users-session:
+    type: uri
+    methods: [GET]
+    uri: /users/session
+    version: 1
+    requestHooks:
+        - session-hook
+        - auth-hook
+
+    handler: users.js:session
+
+
+user-type:
+    type: type
+    # this is not necesary but could be usefull in large files to avoid naming collisions
+    name: level
+    cast: object
+    object:
+        name:
+            cast: string
+            constraints:
+                length: [4, 32]
+        password:
+            cast: string
+            constraints:
+                length: [4, 32]

@@ -1,0 +1,126 @@
+<link rel="stylesheet" href="http://nodejs.org/api/assets/style.css">
+<link rel="stylesheet" href="http://nodejs.org/api/assets/sh.css">
+<h1>/date-diff</h1>
+<h2>GET</h2>
+<p>Get the date difference between given and the server.
+</p>
+<h3>Parameters</h3>
+<pre class=sh_sourceCode>
+<span class=sh_string>date</span>  <span class=sh_keyword>date</span>  <span>[<span class=sh_keyword>date</span>]</span>  current client date
+</pre>
+<h3>Response</h3>
+<pre class=sh_sourceCode>
+<span class=sh_string>diff</span>  <span class=sh_keyword>int</span>
+</pre>
+<h1>/server-bad-date</h1>
+<h2>GET</h2>
+<p>Get the date difference between given and the server.
+</p>
+<h3>Parameters</h3>
+<pre class=sh_sourceCode>
+</pre>
+<h3>Response</h3>
+<pre class=sh_sourceCode>
+<span class=sh_string>date</span>  <span class=sh_keyword>date</span>  <span>[<span class=sh_keyword>date</span>]</span>  current server date
+<span class=sh_string>give-me-an-error</span>  This parameter don't exists in response for test purposes
+</pre>
+<h1>/server-date</h1>
+<h2>GET</h2>
+<p>Get the date difference between given and the server.
+</p>
+<h3>Parameters</h3>
+<pre class=sh_sourceCode>
+</pre>
+<h3>Response</h3>
+<pre class=sh_sourceCode>
+<span class=sh_string>date</span>  <span>[<span class=sh_keyword>date</span>]</span>  current server date
+</pre>
+<h1>/test/continue-on-error</h1>
+<h2>GET</h2>
+<p>Test requestHooksPolicy CONTINUE_ON_ERROR. The parameter "do_not_send_me" wont be sent but session-hook and auth-hook will be called
+</p>
+<h3>Notes</h3>
+<ul><li>Create a session if needed</li><li>Require Authetication</li></ul>
+<h3>Parameters</h3>
+<pre class=sh_sourceCode>
+<span class=sh_string>do_not_send_me</span>  <span class=sh_keyword>string</span>  <span>[<span class=sh_keyword>length</span>([1,32])]</span>
+</pre>
+<h3>Response</h3>
+<pre class=sh_sourceCode>
+</pre>
+<h1>/test/date</h1>
+<h2>GET</h2>
+<p>Method that returns given date.
+</p>
+<h3>Parameters</h3>
+<pre class=sh_sourceCode>
+<span class=sh_string>date</span>  <span class=sh_keyword>date</span>  <span>[<span class=sh_keyword>date</span>]</span>
+</pre>
+<h3>Response</h3>
+<pre class=sh_sourceCode>
+</pre>
+<h1>/test/object-param</h1>
+<h2>GET</h2>
+<p>Method to test request objects structure/validation and casting
+</p>
+<h3>Parameters</h3>
+<pre class=sh_sourceCode>
+<span class=sh_string>user</span>  <span class=sh_keyword>object</span>  
+  <span class=sh_string>name</span>  <span class=sh_keyword>string</span>  <span>[<span class=sh_keyword>length</span>([1,32])]</span>  
+  <span class=sh_string>surname</span>  <span class=sh_keyword>string</span>  <span>[<span class=sh_keyword>length</span>([1,32])]</span>  
+  <span class=sh_string>optional-sub</span>  <span class=sh_keyword>object</span>  <span>[<span class=sh_keyword>optional</span>, <span class=sh_keyword>length</span>([4,32])]</span>  
+    <span class=sh_string>deep-enought</span>  <span class=sh_keyword>string</span>
+</pre>
+<h3>Response</h3>
+<pre class=sh_sourceCode>
+</pre>
+<h1>/test/object-param2</h1>
+<h2>GET</h2>
+<p>undefined</p>
+<h3>Parameters</h3>
+<pre class=sh_sourceCode>
+<span class=sh_string>user</span>  <span class=sh_keyword>object</span>  
+  <span class=sh_string>name</span>  <span class=sh_keyword>string</span>  <span>[<span class=sh_keyword>length</span>([1,32])]</span>  
+  <span class=sh_string>surname</span>  <span class=sh_keyword>string</span>  <span>[<span class=sh_keyword>length</span>([1,32])]</span>
+</pre>
+<h3>Response</h3>
+<pre class=sh_sourceCode>
+</pre>
+<h1>/users/login</h1>
+<h2>POST</h2>
+<p>undefined</p>
+<h3>Notes</h3>
+<ul><li>Create a session if needed</li></ul>
+<h3>Parameters</h3>
+<pre class=sh_sourceCode>
+<span class=sh_string>username</span>  <span class=sh_keyword>string</span>  <span>[<span class=sh_keyword>length</span>([4,32])]</span>  This comment will be used if no other comment is defined for a parameter named username
+
+<span class=sh_string>password</span>  <span class=sh_keyword>string</span>  <span>[<span class=sh_keyword>length</span>([4,32])]</span>  login password
+<span class=sh_string>timestamp</span>  <span class=sh_keyword>int</span>  <span>[<span class=sh_keyword>int</span>]</span>  current timestamp just a dummy parameter to test casting
+</pre>
+<h3>Response</h3>
+<pre class=sh_sourceCode>
+</pre>
+<h1>/users/login-alt</h1>
+<h2>POST</h2>
+<p>undefined</p>
+<h3>Parameters</h3>
+<pre class=sh_sourceCode>
+<span class=sh_string>username</span>  <span class=sh_keyword>string</span>  This comment will be used if no other comment is defined for a parameter named username
+
+<span class=sh_string>password</span>  <span class=sh_keyword>string</span>
+</pre>
+<h3>Response</h3>
+<pre class=sh_sourceCode>
+</pre>
+<h1>/users/session</h1>
+<h2>GET</h2>
+<p>undefined</p>
+<h3>Notes</h3>
+<ul><li>Create a session if needed</li><li>Require Authetication</li></ul>
+<h3>Parameters</h3>
+<pre class=sh_sourceCode>
+</pre>
+<h3>Response</h3>
+<pre class=sh_sourceCode>
+</pre>
