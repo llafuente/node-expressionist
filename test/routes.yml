@@ -69,11 +69,13 @@ auth-hook:
     type: requestHook
     target: auth.js:preHook
     doc: >
-        This method requires Authetication
+        Require Authetication
 
 json-hook:
     type: responseHook
     target: response.js:toJSON
+    doc: >
+        Transform response object to JSON
 
 #
 # URIs
@@ -264,7 +266,7 @@ users-login-alt:
     # in this example handler must be: function(username, password, timestamp, req, res, next)
     # arguments length checked to keep consistency between changes.
     # FUTURE: force arguments names to be the same
-    handlerArguments: EXPANDED
+    handlerArguments: EXPAND
     #handlerArgumentsOrder:
     handler: users.js:login_alt
 
