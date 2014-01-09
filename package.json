@@ -12,7 +12,8 @@
     "test": "test"
   },
   "scripts" : {
-    "test" : "tap test/test*.js"
+    "test" : "tap test/test*.js",
+    "coverage": "node test/code-coverage.js"
   },
   "repository": {
     "type": "git",
@@ -36,6 +37,7 @@
   },
   "devDependencies": {
     "tap" : "~0.2.5",
+    "ass": "*",
     "request" : "*"
   }
 }

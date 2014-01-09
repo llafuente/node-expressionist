@@ -1,5 +1,6 @@
 (function () {
     "use strict";
+    require('ass')
 
     var tap = require("tap"),
         util = require("util"),
