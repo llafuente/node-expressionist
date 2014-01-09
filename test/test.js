@@ -229,6 +229,29 @@
         });
     });
 
+    test("call /users/login-alt", function (t) {
+
+        expresionist.call("/users/login-alt", "post", {
+                query: {
+                    username: "user-test"
+                },
+                body: {
+                    password: "pwd-test"
+                }
+        }, function (response) {
+
+            console.log(response);
+            process.exit();
+
+            t.equal(response.success, false, "success!");
+            t.equal(response.errors[0].message, "invalid-output", "invalid-input message");
+
+            t.end();
+        });
+    });
+
+
+
     test("generate documentation", function (t) {
 
         expresionist.exportDoc("doc.html");

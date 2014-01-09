@@ -82,6 +82,9 @@ test-date:
     type: uri
     methods: [GET]
     uri: /test/date
+    doc: >
+        Method that returns given date.
+
     handler: users.js:ret_get
     get: # GET
         date:
@@ -89,10 +92,14 @@ test-date:
             constraints:
                 date:
 
+
 test-object-param:
     type: uri
     methods: [GET]
     uri: /test/object-param
+    doc: >
+        Method to test request objects structure/validation and casting
+
     handler: users.js:ret_get
     get: # GET
         user:
@@ -143,6 +150,10 @@ test-continue-on-error:
     type: uri
     methods: [GET]
     uri: /test/continue-on-error
+    doc: >
+        Test requestHooksPolicy CONTINUE_ON_ERROR.
+        The parameter "do_not_send_me" wont be sent but session-hook and auth-hook will be called
+
     handler: users.js:ret_get
     requestHooksPolicy: CONTINUE_ON_ERROR
     requestHooks:
@@ -195,6 +206,9 @@ get-date-diff: # This is the ID, must be unique, only the last one prevail
             doc: current client date
             constraints:
                 date:
+    response:
+        diff:
+            cast: int
 
 
 get-server-date: # This is the ID, must be unique, only the last one prevail
@@ -222,40 +236,26 @@ get-bad-server-date: # This is the ID, must be unique, only the last one prevail
     response: # GET data validation
         date:
             doc: current server date
+            cast: date
             constraints:
                 date:
         give-me-an-error:
-            doc: This parameter don exists in response
-            constraints:
-                date:
+            doc: This parameter don't exists in response for test purposes
 
 
-users-login2:
+users-login-alt:
     type: uri
     methods: [POST]
-    uri: /users/login2
-    version: 1
-    # hook list
-    requestHooksPolicy: STOP_ON_ERROR | IGNORE_ERRORS
-    requestHooks:
-        - session-hook
-    responsetHooks:
+    uri: /users/login-alt
 
     params: #url
     get: # GET
+        username:
+            case: string
+
     post: # POST
-        ar_int_data:
-            cast: array
-            constraints:
-            each:
-                cast: string
-        user:
-            cast: reference
-            name: user-type
-        timestamp:
-            cast: int
-            constraints:
-                int:
+        password:
+            cast: string
 
 
     # this will take in the following order
@@ -264,9 +264,9 @@ users-login2:
     # in this example handler must be: function(username, password, timestamp, req, res, next)
     # arguments length checked to keep consistency between changes.
     # FUTURE: force arguments names to be the same
-    handlerArguments: EXPANDED | DEFAULT
-    handlerArgumentsOrder: params|post|get
-    handler: users.js:login
+    handlerArguments: EXPANDED
+    #handlerArgumentsOrder:
+    handler: users.js:login_alt
 
 users-session:
     type: uri
