@@ -12,7 +12,7 @@
     "test": "test"
   },
   "scripts" : {
-    "test" : "tap test/test*.js",
+    "test" : "tap test/test.js",
     "coverage": "node test/code-coverage.js"
   },
   "repository": {
@@ -29,7 +29,7 @@
     "node": ">=0.4"
   },
   "dependencies" : {
-    "express" : "2.*",
+    "express" : "*",
     "js-yaml" : "*",
     "validator" : "3.1.0",
     "object-enhancements" : "*",
