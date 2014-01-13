@@ -249,5 +249,6 @@ p code, span.type {
     top: 25px;
 }
 #index .active {
+    color: #259DFF;
     font-weight: bold;
 }
