@@ -16,11 +16,13 @@ body {
 
 a {
   color: #480;
-  text-decoration: underline;
+  text-decoration: none;
+  border-bottom: 1px dashed;
+
 }
 
 a:visited {
-  color: #46483e;
+  color: #480;
   text-decoration: underline;
 }
 
@@ -239,4 +241,13 @@ p code, span.type {
 
 .sh_sourceCode .type {
   color: #666;
+}
+
+#index {
+    position: fixed;
+    right: 25px;
+    top: 25px;
+}
+#index .active {
+    font-weight: bold;
 }
