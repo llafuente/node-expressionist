@@ -69,7 +69,7 @@ auth-hook:
     type: requestHook
     target: auth.js:preHook
     doc: >
-        Require Authetication
+        Require Authentication
 
 json-hook:
     type: responseHook
