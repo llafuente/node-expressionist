@@ -36,7 +36,8 @@ get-date-diff:
       diff:
         cast: integer
         doc: Difference in milliseconds
-
+    data:
+      #here put your application data, ex: access control using user-permissions
 ```
 
 After that create expressionist and load the YML.
@@ -135,7 +136,8 @@ You can use handlerArguments: EXPAND to add inputs from get/post/param directly 
 ### Handler parameters (req, res, next)
 
 #### Request
-Nothing is added atm but input it's casted as defined.
+
+* **route** It's all the route JSON, here you can access your "data"
 
 #### Response
 First **do not use res.send** unlike you really want it!

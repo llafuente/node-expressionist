@@ -10,7 +10,7 @@ body {
   color: black;
   background-color: white;
   margin: 0;
-  padding: 50px;
+  padding: 0 0 0 50px;
   border-top: 6px #8CC84B solid;
 }
 
@@ -242,13 +242,21 @@ p code, span.type {
 .sh_sourceCode .type {
   color: #666;
 }
-
+#index ul {
+  padding: 20px 0;
+}
 #index {
     position: fixed;
-    right: 25px;
-    top: 25px;
+    right: 0px;
+    top: 0;
+    width: 350px;
+    overflow-y: scroll;
+    max-height: 100%;
 }
 #index .active {
     color: #259DFF;
     font-weight: bold;
+}
+#content {
+  padding-right: 350px;
 }
