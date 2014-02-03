@@ -1,21 +1,24 @@
 <link rel="stylesheet" href="documentator.css">
-<ul class="index"><li><a href="#_date-diff"></a></li><li><a href="#_server-bad-date"></a></li><li><a href="#_server-date"></a></li><li><a href="#_test/continue-on-error"></a></li><li><a href="#_test/date"></a></li><li><a href="#_test/object-param"></a></li><li><a href="#_test/object-param2"></a></li><li><a href="#_users/login"></a></li><li><a href="#_users/login-alt"></a></li><li><a href="#_users/session"></a></li></ul>
-<a name="#_date-diff"></a>
-<h1>/date-diff</h1>
+<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+<script src="./documentator.html.js"></script>
+<div id="index"><ul><li><a href="#date-diff">/date-diff</a></li><li><a href="#server-bad-date">/server-bad-date</a></li><li><a href="#server-date">/server-date</a></li><li><a href="#testcontinue-on-error">/test/continue-on-error</a></li><li><a href="#testdate">/test/date</a></li><li><a href="#testobject-param">/test/object-param</a></li><li><a href="#testobject-param2">/test/object-param2</a></li><li><a href="#userslogin">/users/login</a></li><li><a href="#userslogin-alt">/users/login-alt</a></li><li><a href="#userssession">/users/session</a></li></ul></div>
+<div id="content">
+<a name="date-diff"></a>
+<h1 id="date-diff">/date-diff</h1>
 <h2>GET</h2>
 <p>Get the date difference between given and the server.</p>
 <h3>Parameters</h3>
 <pre class="parameters">
 GET:
-  <span class="name">date</span>  <span class="type">date</span>  <span class="constraints">[date]</span>  current client date  
+  <span class="name">date</span>  <span class="type">date</span>  <span class="constraints">[date]</span>  current client date
 </pre>
 <h3>Response</h3>
 <pre class="parameters">
-  <span class="name">diff</span>  <span class="type">int</span>       
+  <span class="name">diff</span>  <span class="type">int</span>
 </pre>
 <hr />
-<a name="#_server-bad-date"></a>
-<h1>/server-bad-date</h1>
+<a name="server-bad-date"></a>
+<h1 id="server-bad-date">/server-bad-date</h1>
 <h2>GET</h2>
 <p>Get the date difference between given and the server.</p>
 <h3>Parameters</h3>
@@ -23,12 +26,12 @@ GET:
 </pre>
 <h3>Response</h3>
 <pre class="parameters">
-  <span class="name">date</span>              <span class="type">date</span>  <span class="constraints">[date]</span>  current server date                                        
-  <span class="name">give-me-an-error</span>                                                                           This parameter don't exists in response for test purposes  
+  <span class="name">date</span>              <span class="type">date</span>    <span class="constraints">[date]</span>  current server date
+  <span class="name">give-me-an-error</span>  <span class="type">string</span>                                           This parameter don't exists in response for test purposes
 </pre>
 <hr />
-<a name="#_server-date"></a>
-<h1>/server-date</h1>
+<a name="server-date"></a>
+<h1 id="server-date">/server-date</h1>
 <h2>GET</h2>
 <p>Get the date difference between given and the server.</p>
 <h3>Parameters</h3>
@@ -36,109 +39,109 @@ GET:
 </pre>
 <h3>Response</h3>
 <pre class="parameters">
-  <span class="name">date</span>    <span class="constraints">[date]</span>  current server date  
+  <span class="name">date</span>  <span class="type">string</span>  <span class="constraints">[date]</span>  current server date
 </pre>
 <hr />
-<a name="#_test/continue-on-error"></a>
-<h1>/test/continue-on-error</h1>
+<a name="testcontinue-on-error"></a>
+<h1 id="testcontinue-on-error">/test/continue-on-error</h1>
 <h2>GET</h2>
 <p>Test requestHooksPolicy CONTINUE_ON_ERROR. The parameter "do_not_send_me" wont be sent but session-hook and auth-hook will be called</p>
 <h3>Notes</h3>
-<ul><li>Create a session if needed</li><li>Require Authetication</li></ul>
+<ul><li>Create a session if needed</li><li>Require Authentication</li></ul>
 <h3>Parameters</h3>
 <pre class="parameters">
 GET:
-  <span class="name">do_not_send_me</span>  <span class="type">string</span>  <span class="constraints">[length([1,32])]</span>    
+  <span class="name">do_not_send_me</span>  <span class="type">string</span>  <span class="constraints">[length([1,32])]</span>
 </pre>
 <h3>Response</h3>
 <pre class="parameters">
 
 </pre>
 <hr />
-<a name="#_test/date"></a>
-<h1>/test/date</h1>
+<a name="testdate"></a>
+<h1 id="testdate">/test/date</h1>
 <h2>GET</h2>
 <p>Method that returns given date.</p>
 <h3>Parameters</h3>
 <pre class="parameters">
 GET:
-  <span class="name">date</span>  <span class="type">date</span>  <span class="constraints">[date]</span>    
+  <span class="name">date</span>  <span class="type">date</span>  <span class="constraints">[date]</span>
 </pre>
 <h3>Response</h3>
 <pre class="parameters">
 
 </pre>
 <hr />
-<a name="#_test/object-param"></a>
-<h1>/test/object-param</h1>
+<a name="testobject-param"></a>
+<h1 id="testobject-param">/test/object-param</h1>
 <h2>GET</h2>
 <p>Method to test request objects structure/validation and casting</p>
 <h3>Parameters</h3>
 <pre class="parameters">
 GET:
-  <span class="name">user</span>  <span class="type">object</span>       
-      <span class="name">name</span>          <span class="type">string</span>  <span class="constraints">[length([1,32])]</span>              
-      <span class="name">surname</span>       <span class="type">string</span>  <span class="constraints">[length([1,32])]</span>              
-      <span class="name">optional-sub</span>  <span class="type">object</span>  <span class="constraints">[optional, length([4,32])]</span>    
-          <span class="name">deep-enought</span>  <span class="type">string</span>       
+  <span class="name">user</span>  <span class="type">object</span>
+      <span class="name">name</span>          <span class="type">string</span>  <span class="constraints">[length([1,32])]</span>
+      <span class="name">surname</span>       <span class="type">string</span>  <span class="constraints">[length([1,32])]</span>
+      <span class="name">optional-sub</span>  <span class="type">object</span>  <span class="constraints">[optional, length([4,32])]</span>
+          <span class="name">deep-enought</span>  <span class="type">string</span>
 </pre>
 <h3>Response</h3>
 <pre class="parameters">
 
 </pre>
 <hr />
-<a name="#_test/object-param2"></a>
-<h1>/test/object-param2</h1>
+<a name="testobject-param2"></a>
+<h1 id="testobject-param2">/test/object-param2</h1>
 <h2>GET</h2>
 <h3>Parameters</h3>
 <pre class="parameters">
 GET:
-  <span class="name">user</span>  <span class="type">object</span>       
-      <span class="name">name</span>     <span class="type">string</span>  <span class="constraints">[length([1,32])]</span>    
-      <span class="name">surname</span>  <span class="type">string</span>  <span class="constraints">[length([1,32])]</span>    
+  <span class="name">user</span>  <span class="type">object</span>
+      <span class="name">name</span>     <span class="type">string</span>  <span class="constraints">[length([1,32])]</span>
+      <span class="name">surname</span>  <span class="type">string</span>  <span class="constraints">[length([1,32])]</span>
 </pre>
 <h3>Response</h3>
 <pre class="parameters">
 
 </pre>
 <hr />
-<a name="#_users/login"></a>
-<h1>/users/login</h1>
+<a name="userslogin"></a>
+<h1 id="userslogin">/users/login</h1>
 <h2>POST</h2>
 <h3>Notes</h3>
 <ul><li>Create a session if needed</li></ul>
 <h3>Parameters</h3>
 <pre class="parameters">
 POST:
-  <span class="name">username</span>   <span class="type">string</span>  <span class="constraints">[length([4,32])]</span>  This comment will be used if no other comment is defined for a parameter named username  
-  <span class="name">password</span>   <span class="type">string</span>  <span class="constraints">[length([4,32])]</span>  login password                                                                           
-  <span class="name">timestamp</span>  <span class="type">int</span>     <span class="constraints">[int]</span>             current timestamp just a dummy parameter to test casting                                 
+  <span class="name">username</span>   <span class="type">string</span>  <span class="constraints">[length([4,32])]</span>
+  <span class="name">password</span>   <span class="type">string</span>  <span class="constraints">[length([4,32])]</span>  login password
+  <span class="name">timestamp</span>  <span class="type">int</span>     <span class="constraints">[int]</span>             current timestamp just a dummy parameter to test casting
 </pre>
 <h3>Response</h3>
 <pre class="parameters">
 
 </pre>
 <hr />
-<a name="#_users/login-alt"></a>
-<h1>/users/login-alt</h1>
+<a name="userslogin-alt"></a>
+<h1 id="userslogin-alt">/users/login-alt</h1>
 <h2>POST</h2>
 <h3>Parameters</h3>
 <pre class="parameters">
 GET:
-  <span class="name">username</span>  <span class="type">string</span>     This comment will be used if no other comment is defined for a parameter named username  
+  <span class="name">username</span>  <span class="type">string</span>
 POST:
-  <span class="name">password</span>  <span class="type">string</span>       
+  <span class="name">password</span>  <span class="type">string</span>
 </pre>
 <h3>Response</h3>
 <pre class="parameters">
 
 </pre>
 <hr />
-<a name="#_users/session"></a>
-<h1>/users/session</h1>
+<a name="userssession"></a>
+<h1 id="userssession">/users/session</h1>
 <h2>GET</h2>
 <h3>Notes</h3>
-<ul><li>Create a session if needed</li><li>Require Authetication</li></ul>
+<ul><li>Create a session if needed</li><li>Require Authentication</li></ul>
 <h3>Parameters</h3>
 <pre class="parameters">
 </pre>
@@ -147,3 +150,4 @@ POST:
 
 </pre>
 <hr />
+</div>
