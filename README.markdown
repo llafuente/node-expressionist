@@ -90,7 +90,7 @@ Contains the following parameters
 * **requestHooks**
 
   List of hooks, must be defined before.
-  
+
   [More info](#responseHooks)
 
 * **handler**
@@ -153,7 +153,7 @@ Additions:
 * **hasErrors** ()
 * **addWarning** (message, code, long_message)
 * **hasWarnings** ()
-* **content** = {} 
+* **content** = {}
   variable where response, errors & warnings are stored. Use it with caution!
 
 
@@ -229,3 +229,23 @@ Note: Response HTTP status code will be the one in the first error: 400. Express
 #### <a name="responseHooks"></a>Response Hooks.
 
 continue soon :)
+
+
+
+## Log
+expressionist use noboxout-log.
+
+
+Mute log
+```js
+    expressionistInstance.logMute = true;
+```
+
+Adjust verbosity
+```js
+    expressionistInstance.logLevel = 4; // all
+    expressionistInstance.logLevel = 3; // no verbose
+    expressionistInstance.logLevel = 2; // no verbose, debug
+    expressionistInstance.logLevel = 1; // no verbose, debug, warn
+    expressionistInstance.logLevel = 0; // no verbose, debug, warn, error
+```
