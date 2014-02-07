@@ -1,6 +1,7 @@
 # node-expressionist [![Build Status](https://secure.travis-ci.org/llafuente/node-expressionist.png?branch=master)](http://travis-ci.org/llafuente/node-expressionist)
 
 
+Notice: This is still a work in process, it's rather stable.
 
 ## Introduction
 
@@ -80,22 +81,25 @@ Contains the following parameters
 
   Documentation text. It's recommended to use "|+" instead of ">" for multi-line text.
 
-* **requestHooks**
+* **requestHooks** (optional)
 
-  List of hooks, must be defined before. Callbacks that are executed before the handler.
+  Callbacks that are executed before the handler.
+  Those hooks, must be defined before or will throw.
 
   [More info](#requestHooks)
 
 
-* **requestHooks**
+* **requestHooks** (optional)
 
-  List of hooks, must be defined before.
+  Callbacks that are executed after the handler.
+  Those hooks, must be defined before or will throw.
 
   [More info](#responseHooks)
 
 * **handler**
 
   FQFN of the handler.
+
 * **handlerArguments** (optional) COMPACT|EXPAND Default: COMPACT *
 
   Define how expressionist send arguments to the handler.
