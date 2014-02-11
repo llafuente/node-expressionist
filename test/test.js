@@ -53,6 +53,8 @@
                 timestamp: "4635618"
             }
         }, function (response) {
+            t.equal(response.success, false);
+            t.equal(response.errors.length, 1);
             t.end();
         });
     });
@@ -79,7 +81,7 @@
             t.equal(response.success, false, "KO");
             t.equal(response.errors.length, 1, "1 error");
             t.equal(response.errors[0].message, "invalid-input");
-            t.equal(response.errors[0].long_message, "constraint [date] fail for [date]", "constraint [date] fail for [date]");
+            t.equal(response.errors[0].long_message, "constraint [date] fail", "constraint [date] fail");
 
             t.end();
         });
@@ -132,7 +134,7 @@
             t.equal(response.success, false, "KO");
             t.equal(response.errors.length, 1, "1 error");
             t.equal(response.errors[0].message, "invalid-input");
-            t.equal(response.errors[0].long_message, "constraint [length] fail for [surname]", "constraint [length] fail for [surname]");
+            t.equal(response.errors[0].long_message, "constraint [length] fail", "constraint [length] fail");
 
             t.end();
         });
@@ -167,7 +169,7 @@
             t.equal(response.success, false, "KO");
             t.equal(response.errors.length, 1, "1 error");
             t.equal(response.errors[0].message, "invalid-input");
-            t.equal(response.errors[0].long_message, "constraint [length] fail for [surname]", "constraint [length] fail for [surname]");
+            t.equal(response.errors[0].long_message, "constraint [length] fail", "constraint [length] fail");
 
             t.end();
         });

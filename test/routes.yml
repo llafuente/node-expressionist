@@ -190,7 +190,7 @@ users-login:
             doc: current timestamp just a dummy parameter to test casting
             cast: int
             constraints:
-                int:
+                integer:
 
     handler: users.js:login
 
@@ -210,7 +210,7 @@ get-date-diff: # This is the ID, must be unique, only the last one prevail
                 date:
     response:
         diff:
-            cast: int
+            cast: integer
 
 
 get-server-date: # This is the ID, must be unique, only the last one prevail
@@ -243,6 +243,8 @@ get-bad-server-date: # This is the ID, must be unique, only the last one prevail
                 date:
         give-me-an-error:
             doc: This parameter don't exists in response for test purposes
+            constraints:
+                notNull:
 
 
 users-login-alt:
