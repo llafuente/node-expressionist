@@ -188,7 +188,7 @@ users-login:
                 length: [4, 32]
         timestamp:
             doc: current timestamp just a dummy parameter to test casting
-            cast: int
+            cast: integer
             constraints:
                 integer:
 

@@ -67,6 +67,7 @@
                 timestamp: "0"
             }
         }, function (response) {
+
             t.equal(response.success, true, "OK!");
             t.end();
         });
@@ -115,7 +116,7 @@
         }, function (response) {
             t.equal(response.success, false, "KO");
             t.equal(response.errors.length, 1, "1 error");
-            t.equal(response.errors[0].long_message, "[surname] is undefined", "[surname] is undefined");
+            t.equal(response.errors[0].long_message, "user.surname is undefined", "[surname] is undefined");
 
             t.end();
         });
@@ -224,7 +225,6 @@
 
         expresionist.call("/server-bad-date", "get", {
         }, function (response) {
-
             t.equal(response.success, false, "success!");
             t.equal(response.errors[0].message, "invalid-output", "invalid-input message");
 
