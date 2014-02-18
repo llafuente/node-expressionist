@@ -81,7 +81,7 @@
         }, function (response) {
             t.equal(response.success, false, "KO");
             t.equal(response.errors.length, 1, "1 error");
-            t.equal(response.errors[0].message, "invalid-input");
+            t.equal(response.errors[0].message, "invalid-input-query");
             t.equal(response.errors[0].long_message, "constraint [date] fail", "constraint [date] fail");
 
             t.end();
@@ -134,7 +134,7 @@
         }, function (response) {
             t.equal(response.success, false, "KO");
             t.equal(response.errors.length, 1, "1 error");
-            t.equal(response.errors[0].message, "invalid-input");
+            t.equal(response.errors[0].message, "invalid-input-query");
             t.equal(response.errors[0].long_message, "constraint [length] fail", "constraint [length] fail");
 
             t.end();
@@ -169,7 +169,7 @@
         }, function (response) {
             t.equal(response.success, false, "KO");
             t.equal(response.errors.length, 1, "1 error");
-            t.equal(response.errors[0].message, "invalid-input");
+            t.equal(response.errors[0].message, "invalid-input-query");
             t.equal(response.errors[0].long_message, "constraint [length] fail", "constraint [length] fail");
 
             t.end();
@@ -185,7 +185,7 @@
 
             t.equal(response.success, false, "KO");
             t.equal(response.errors.length, 2, "1 error");
-            t.equal(response.errors[0].message, "invalid-input");
+            t.equal(response.errors[0].message, "invalid-input-query");
             t.equal(response.errors[1].message, "invalid-auth");
 
             t.end();

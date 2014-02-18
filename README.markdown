@@ -8,14 +8,7 @@ Notice: This is still a work in process, it's rather stable.
 Wrapper on top express to Write, Document and 'Create the client'™ of REST APIs
 
 
-## Expres changes
-
-### req.params
-Express params are an array that also contains the keys, like it was an object.
-Obviously it shouldn't be an array, expressionist change it to an object 100% compatible.
-
-
-## Why exception?
+## Why exceptions?
 
 Expressionist will throw only when find an invalid input that the developer write.
 Any other error (user input) will add errors to response.
@@ -32,13 +25,13 @@ You could even use JSON, YML is translated to JSON
 get-date-diff:
     # Type of object, you can define more than just URIs...
     type: uri
-    
+
     # array of methods: GET,POST,PUT,DELETE,PATCH,HEAD
     methods: [GET]
-    
+
     # entry point
     uri: /date-diff
-    
+
     # documentation, it's recommended to use |+ or >
     doc: |+
       Get the date difference between given and the server.
@@ -99,7 +92,10 @@ After that create expressionist and load the YML.
 ## URI definitions (type: uri)
 Contains the following parameters
 
-* **methods** (array, required) GET,POST,PUT,DELETE,PATCH,HEAD
+* **methods** (array, required)
+
+  GET,POST,PUT,DELETE,PATCH,HEAD
+
 * **uri** (string, required)
 
   If the URL starts with "/", there will be no version-ing (recommended)
@@ -109,27 +105,40 @@ Contains the following parameters
 
   Documentation text. It's recommended to use "|+" instead of ">" for multi-line text.
 
+* **params, get, post & files**
+
+  Input schema. See (utilitario)[https://github.com/llafuente/utilitario] module for more information.
+  * **cast**
+  * **constraints**, list/object of constraints that the input has to meet.
+  * **object**, require "cast: object", define the schema of each key
+  * **items**, require "cast: array", define each item schema
+  * **sanitize**, not only clean the input also can do some transformation to it, like lowercase
+  * **default**, set the default value (that will also be casted!)
+
+
 * **requestHooks** (array, optional) [More info](#requestHooks)
 
   Callbacks that are executed before the handler.
+
   Note: Must be defined before or will throw.
 
-* **requestHooksPolicy** (string[null, CONTINUE_ON_ERROR])
+* **requestHooksPolicy** (string[null, CONTINUE_ON_ERROR], optional)
 
   When any requestHook add an error, the execution stop and return the error to the user.
 
-  In some cases you will want to continue even if errors are found like start-transaction / end-transaction 
+  In some cases you will want to continue even if errors are found like start-transaction / end-transaction
 
   CONTINUE_ON_ERROR will execute all requestHook(**DONE**) and responseHooks(**TODO**) but not the handler.
 
-* **requestHooks** (array, optional) [More info](#responseHooks)
+* **handler** (string)
 
-  Callbacks that are executed after the handler.
-  Note: Must be defined before or will throw.
+  [FQFN](#FQFN) of the handler.
 
-* **handler**
+  Note: Parameters count is checked and throw an exception a difference is found.
 
-  (FQFN)[#FQFN] of the handler.
+  The handler is a function and must have three parameters (req, res, next)
+
+  You can use handlerArguments: EXPAND to add inputs from get/post/param directly as arguments in the function (@todo link to example)
 
 * **handlerArguments** (string[COMPACT,EXPAND], optional) Default: COMPACT
 
@@ -143,54 +152,50 @@ Contains the following parameters
 
   Do not handle name collisions. In case GET/POST input has the same name (not recommended!!) will use the first found using the preference above.
 
-* **params, get, post & files**
+* **requestHooks** (array, optional) [More info](#responseHooks)
 
-  Input schema. See (utilitario)[https://github.com/llafuente/utilitario] module for more information.
-  * **cast**
-  * **constraints**, list of constraints that the input has to meet.
-  * **object**, require "cast: object", define the schema of each key
-  * **items**, require "cast: array", define each item schema
+  Callbacks that are executed after the handler.
+
+  Note: Must be defined before or will throw.
+
 
 * **response**
 
   Define response schema.
   It's applied only if the response send success: true
-  
+
   If the response is invalid a error response will be sent instead.
 
-* **version** (do not use yet)
+* **version** (number)
+  I plan to include this in the URL but can't find a proper way to do it. Any suggestions/issue!?
 
 
 ## <a name="FQFN"></a> FQFN
 
-Fully Qualified Function Name.
-It's just a way to translate a string into function but requiring a module.
+**F**ully **Q**ualified **F**unction **N**ame.
+It's just a way to translate a string into function but requiring a module, not just by name.
 
 ```js
-"users.js:get" // require("users.js").get
-"users.js:read.one" // require("users.js").read.one
+"users.js:get" // tranlated into: require("users.js").get
+"users.js:read.one" // tranlated into: require("users.js").read.one
 
 // todo for future improvements
-"users.js:!ret_get" // (new require("users.js")).ret_get
+"users.js:!ret_get" // tranlated into:  (new require("users.js")).ret_get
 ```
-
-Note: Parameters count is check and throw an exception.
-The handler is a function and must have three parameters (req, res, next)
-You can use handlerArguments: EXPAND to add inputs from get/post/param directly as arguments in the function (@todo link to example)
 
 
 ### Handler default parameters (req, res, next)
 
-#### Request
+#### Request (req)
 
-The same request as express adding:
+Two changes from express
 
-* **route** It's all the route JSON, here you can access your "data"
+* Add **route** It's all the route JSON, here you can access your "data"
+* Replace params for a 100% compatible object. *params* in express is an array that has keys, that's an object.
 
-Note: req.params is changed to an object.
+#### Response (res)
 
-#### Response
-First **do not use res.send** unlike you really want it!
+**Do not use res.send** unlike you really want it! this will raise a warning.
 
 This is not the way to work with expressionist (it's the 'express' way). You should use: setResponse
 Expressionist is compatible with existing 'express' applications but encourage you to use another aproach.
@@ -207,8 +212,10 @@ Additions:
   variable where response, errors & warnings are stored. Use it with caution!
 
 
-#### next (callback)
-it's the callback to continue with the execution. It's a good practice to always use "return next();", avoid executing twice the callback.
+#### Callback (next)
+it's the callback to continue with the execution.
+It's a good practice to always use "return next();", avoid executing twice the callback.
+Calling twice next could lead to many many problems. We will try to implement something to avoid it in the future.
 
 
 ### <a name="requestHooks"></a> Request Hooks.
@@ -241,9 +248,10 @@ private-zone:
         This example amuse that you don't send any parameter.
         You will have many errors in the response
 
-    #function handler must exists
+    # function handler must exists
     handler: private.js:get_zone
 
+    # continue to see both errors
     requestHooksPolicy: CONTINUE_ON_ERROR
     requestHooks:
         - auth-hook
@@ -278,7 +286,8 @@ Note: Response HTTP status code will be the one in the first error: 400. Express
 
 #### <a name="responseHooks"></a>Response Hooks.
 
-continue soon :)
+Same idea as requestHooks, but this time after the handler, so they have the response.
+Useful for response encoding, set headers, close connections to database, etc.
 
 
 
