@@ -1,5 +1,6 @@
 # node-expressionist [![Build Status](https://secure.travis-ci.org/llafuente/node-expressionist.png?branch=master)](http://travis-ci.org/llafuente/node-expressionist)
 
+![NPM](https://nodei.co/npm/node-expressionist.png?compact=true)
 
 Notice: This is still a work in process, it's rather stable.
 
