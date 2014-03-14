@@ -8,6 +8,8 @@
         Expresionist = require("../index.js"),
         expresionist,
         express = require("express"),
+        bodyParser = require("body-parser"),
+        cookieParser = require('cookie-parser'),
         app = express(),
         server,
         request = require("request"),
@@ -15,8 +17,8 @@
 
         exit = process.exit;
 
-    app.use(express.cookieParser('no-more-secrets'));
-    app.use(express.bodyParser());
+    app.use(cookieParser('no-more-secrets'));
+    app.use(bodyParser());
 
     test("init and attach", function (t) {
         expresionist = new Expresionist();
@@ -54,7 +56,7 @@
             }
         }, function (response) {
             t.equal(response.success, false);
-            t.equal(response.errors.length, 1);
+            t.equal(response.errors.length, 2);
             t.end();
         });
     });

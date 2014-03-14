@@ -11,8 +11,8 @@
     "lib": ".",
     "test": "test"
   },
-  "scripts" : {
-    "test" : "tap test/test.js",
+  "scripts": {
+    "test": "tap test/test.js",
     "coverage": "node test/code-coverage.js"
   },
   "repository": {
@@ -28,18 +28,20 @@
   "engine": {
     "node": ">=0.4"
   },
-  "dependencies" : {
-    "express" : "*",
-    "js-yaml" : "*",
-    "validator" : "3.1.0",
-    "object-enhancements" : "*",
-    "array-enhancements" : "*",
-    "function-enhancements" : "*",
-    "noboxout-log" : "*"
+  "dependencies": {
+    "express": "3.5.*",
+    "body-parser": "^1.0.0",
+    "cookie-parser": "^1.0.1",
+    "js-yaml": "*",
+    "object-enhancements": "*",
+    "array-enhancements": "*",
+    "function-enhancements": "*",
+    "noboxout-log": "*",
+    "utilitario": "*"
   },
   "devDependencies": {
-    "tap" : "~0.2.5",
+    "tap": "~0.2.5",
     "ass": "0.0.4",
-    "request" : "*"
+    "request": "*"
   }
 }
