@@ -194,6 +194,8 @@ Two changes from express
 * Add **route** It's all the route JSON, here you can access your "data"
 * Replace params for a 100% compatible object. *params* in express is an array that has keys, that's an object.
 
+* primary [boolean] Tell you if the request is HTTP (true) or is using expressionist.call method (false)
+
 #### Response (res)
 
 **Do not use res.send** unlike you really want it! this will raise a warning.
