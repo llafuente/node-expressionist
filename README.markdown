@@ -21,8 +21,8 @@ You could even use JSON, YML is translated to JSON
 
 ```yml
 
-# note: the identifier must be unique, YML overwrite keys so the last one prevail.
-# note: it's used to create the client
+# note: the identifier must be unique, YML overwrite keys so the last one will prevail.
+# note: it's used to create the client see below!
 get-date-diff:
     # Type of object, you can define more than just URIs...
     type: uri
@@ -291,6 +291,53 @@ Note: Response HTTP status code will be the one in the first error: 400. Express
 
 Same idea as requestHooks, but this time after the handler, so they have the response.
 Useful for response encoding, set headers, close connections to database, etc.
+
+
+
+## Client generation
+
+usage: expresionist.nodeClient(String base_url, Function post_process)
+
+example:
+
+```yml
+# It's recommended to start IDs with the group sent in loadYML/JSON, because the client is grouped by 'group'
+users-read-one: #users.readOne
+    type: uri
+    methods: [GET]
+    uri: /users/:user_id
+    doc: >
+        Read user information
+
+    handler: users.js:read
+
+    params:
+        user_id:
+            cast: integer
+```
+
+```js
+expressionist.loadYML("users.yml", "users", function () {
+});
+var client = expresionist.nodeClient("http://www.mydomain.com", function (data) {
+    return JSON.parse(data);
+});
+
+client.users.readOne(1, {/*get*/}, {/*post*/}, function(err, data, res) {
+});
+```
+
+Notes:
+
+* Function name is camel case of the ID.
+* First arguments are params, in the order defined
+* Then GET/POST objects
+* Then the callback
+* everything is required
+
+TODO:
+
+* generate a documentation or even even better, a file.
 
 
 
