@@ -1,29 +1,27 @@
 # node-expressionist [![Build Status](https://secure.travis-ci.org/llafuente/node-expressionist.png?branch=master)](http://travis-ci.org/llafuente/node-expressionist)
 
-![NPM](https://nodei.co/npm/node-expressionist.png?compact=true)
+![NPM](https://nodei.co/npm/apis-expressionist.png?compact=true)
 
-Notice: This is still a work in process, it's rather stable.
+
+## Preface
+
+This is still a work in process, it's rather stable and used in a single production object.
+
 
 ## Introduction
 
 Wrapper on top express to Write, Document and 'Create the client'™ of REST APIs
 
 
-## Why exceptions?
-
-Expressionist will throw only when find an invalid input that the developer write.
-Any other error (user input) will add errors to response.
-
 ## How to write an API ?
 
 First write an YML with your URLs, Parameters, Validations, Constraints, Hooks, Handlers and Documentation. All in one place :)
-You could even use JSON, YML is translated to JSON
+You could use JSON too, in fact, YML is translated to JSON.
 
 ```yml
 
-# note: the identifier must be unique, YML overwrite keys so the last one will prevail.
-# note: it's used to create the client see below!
-get-date-diff:
+# The identifier must be unique, YML overwrite keys.
+get-date-diff: # this will be the client function name camel-cased.
     # Type of object, you can define more than just URIs...
     type: uri
 
@@ -37,10 +35,10 @@ get-date-diff:
     doc: |+
       Get the date difference between given and the server.
 
-    # main function that will manage the request
+    # FQFN: main function that will manage the request
     handler: date.js:diff
 
-    # input validation via GET
+    # input validation via GET (query)
     get:
         date:
             cast: date
@@ -50,15 +48,18 @@ get-date-diff:
     # input validation via POST (body)
     post:
 
-    # response validation (success === true)
+    # input validation in the uri params
+    params:
+
+    # response validation (if success === true)
     response:
         diff:
             cast: integer
             doc: Difference in milliseconds
 
-    # custom data, can be retrieve via req.route.data
+    # custom data, can be retrieve via req.route.data in the handler
     data:
-      #here put your application data, ex: access control using user-permissions
+        #here put your application data, ex: access control using user-permissions
 ```
 
 After that create expressionist and load the YML.
@@ -70,10 +71,12 @@ After that create expressionist and load the YML.
         express = require("express"),
         app = express();
 
-
+    // init express
+    // this will change when express 4.0 it's released
     app.use(express.cookieParser('no-more-secrets'));
     app.use(express.bodyParser());
 
+    // init expressionist
     expressionist = new Expresionist();
     expressionist.rootDir = __dirname;
     expressionist.attach(app);
@@ -83,9 +86,9 @@ After that create expressionist and load the YML.
     });
 
     // I found interesting to concatenate various files, and group it
-    // groups can be used to export documentation
+    // groups can be used to export documentation and sort client code.
     expressionist.loadYML(["common-hooks.yml", "users.yml"], "users", function () {
-      // note: YML exception will not match line in file
+        // note: YML exception will not match line in file
     });
 
 ```
@@ -95,7 +98,7 @@ Contains the following parameters
 
 * **methods** (array, required)
 
-  GET,POST,PUT,DELETE,PATCH,HEAD
+  GET, POST, PUT, DELETE, PATCH, HEAD
 
 * **uri** (string, required)
 
@@ -173,7 +176,7 @@ Contains the following parameters
 
 ## <a name="FQFN"></a> FQFN
 
-**F**ully **Q**ualified **F**unction **N**ame.
+**F** ully **Q** ualified **F** unction **N** ame.
 It's just a way to translate a string into function but requiring a module, not just by name.
 
 ```js
@@ -301,7 +304,8 @@ usage: expresionist.nodeClient(String base_url, Function post_process)
 example:
 
 ```yml
-# It's recommended to start IDs with the group sent in loadYML/JSON, because the client is grouped by 'group'
+# It's recommended to start IDs with the group sent in loadYML/JSON
+# because the client is grouped by 'group'
 users-read-one: #users.readOne
     type: uri
     methods: [GET]
@@ -339,7 +343,10 @@ TODO:
 
 * generate a documentation or even even better, a file.
 
+## Why exceptions?
 
+Expressionist will throw only when find an invalid input that the developer write.
+Any other error (user input) will add errors to response.
 
 ## Log
 expressionist use noboxout-log.
@@ -348,13 +355,15 @@ expressionist use noboxout-log.
 Mute log
 ```js
     expressionistInstance.logMute = true;
+    expressionistInstance.logTraces = 2; // how many stack item should be displayed
 ```
 
 Adjust verbosity
 ```js
-    expressionistInstance.logLevel = 4; // all
-    expressionistInstance.logLevel = 3; // no verbose
-    expressionistInstance.logLevel = 2; // no verbose, debug
-    expressionistInstance.logLevel = 1; // no verbose, debug, warn
-    expressionistInstance.logLevel = 0; // no verbose, debug, warn, error
+    expressionistInstance.logLevel = 5; // all
+    expressionistInstance.logLevel = 4; // no verbose
+    expressionistInstance.logLevel = 3; // no verbose, debug
+    expressionistInstance.logLevel = 2; // no verbose, debug, info
+    expressionistInstance.logLevel = 1; // no verbose, debug, info, warn
+    expressionistInstance.logLevel = 0; // no verbose, debug, info, warn, error
 ```

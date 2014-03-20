@@ -30,7 +30,7 @@
     });
 
     test("load YML", function (t) {
-        expresionist.loadYML("routes.yml", function () {
+        expresionist.loadYML("routes.yml", "test", function () {
             t.equal(Object.keys(expresionist.uris.get).length, 8, "number of get uris");
             t.equal(Object.keys(expresionist.uris.post).length, 2, "number of post uris");
             t.equal(Object.keys(expresionist.uris.put).length, 0, "number of put uris");

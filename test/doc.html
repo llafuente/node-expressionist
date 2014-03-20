@@ -16,6 +16,9 @@ GET:
 <pre class="parameters">
   <span class="name">diff</span>  <span class="type">integer</span>
 </pre>
+<h3>Client</h3>
+<pre class="parameters">test.getDateDiff(Object get, Object post, Function callback)
+</pre>
 <hr />
 <a name="server-bad-date"></a>
 <h1 id="server-bad-date">/server-bad-date</h1>
@@ -29,6 +32,9 @@ GET:
   <span class="name">date</span>              <span class="type">date</span>    <span class="constraints">[date]</span>     current server date
   <span class="name">give-me-an-error</span>  <span class="type">string</span>  <span class="constraints">[notNull]</span>  This parameter don't exists in response for test purposes
 </pre>
+<h3>Client</h3>
+<pre class="parameters">test.getBadServerDate(Object get, Object post, Function callback)
+</pre>
 <hr />
 <a name="server-date"></a>
 <h1 id="server-date">/server-date</h1>
@@ -40,6 +46,9 @@ GET:
 <h3>Response</h3>
 <pre class="parameters">
   <span class="name">date</span>  <span class="type">string</span>  <span class="constraints">[date]</span>  current server date
+</pre>
+<h3>Client</h3>
+<pre class="parameters">test.getServerDate(Object get, Object post, Function callback)
 </pre>
 <hr />
 <a name="testcontinue-on-error"></a>
@@ -57,6 +66,9 @@ GET:
 <pre class="parameters">
 
 </pre>
+<h3>Client</h3>
+<pre class="parameters">test.continueOnError(Object get, Object post, Function callback)
+</pre>
 <hr />
 <a name="testdate"></a>
 <h1 id="testdate">/test/date</h1>
@@ -70,6 +82,9 @@ GET:
 <h3>Response</h3>
 <pre class="parameters">
 
+</pre>
+<h3>Client</h3>
+<pre class="parameters">test.date(Object get, Object post, Function callback)
 </pre>
 <hr />
 <a name="testobject-param"></a>
@@ -89,6 +104,9 @@ GET:
 <pre class="parameters">
 
 </pre>
+<h3>Client</h3>
+<pre class="parameters">test.objectParam(Object get, Object post, Function callback)
+</pre>
 <hr />
 <a name="testobject-param2"></a>
 <h1 id="testobject-param2">/test/object-param2</h1>
@@ -103,6 +121,9 @@ GET:
 <h3>Response</h3>
 <pre class="parameters">
 
+</pre>
+<h3>Client</h3>
+<pre class="parameters">test.objectParam2(Object get, Object post, Function callback)
 </pre>
 <hr />
 <a name="userslogin"></a>
@@ -121,6 +142,9 @@ POST:
 <pre class="parameters">
 
 </pre>
+<h3>Client</h3>
+<pre class="parameters">test.usersLogin(Object get, Object post, Function callback)
+</pre>
 <hr />
 <a name="userslogin-alt"></a>
 <h1 id="userslogin-alt">/users/login-alt</h1>
@@ -136,6 +160,9 @@ POST:
 <pre class="parameters">
 
 </pre>
+<h3>Client</h3>
+<pre class="parameters">test.usersLoginAlt(Object get, Object post, Function callback)
+</pre>
 <hr />
 <a name="userssession"></a>
 <h1 id="userssession">/users/session</h1>
@@ -148,6 +175,9 @@ POST:
 <h3>Response</h3>
 <pre class="parameters">
 
+</pre>
+<h3>Client</h3>
+<pre class="parameters">test.usersSession(Object get, Object post, Function callback)
 </pre>
 <hr />
 </div>
