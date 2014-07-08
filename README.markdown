@@ -3,21 +3,20 @@
 ![NPM](https://nodei.co/npm/apis-expressionist.png?compact=true)
 
 
-## Preface
-
-This is still a work in process, it's rather stable and used in a single production object.
-
-
 ## Introduction
 
-Wrapper on top express to Write, Document and 'Create the client'™ of REST APIs
+Expresionist.wrapper(express).for(['Write', 'Document', 'Generate client']).of('REST APIs')
+
+aka: Wrapper on top of express to Write, Document and 'Create the client'™ of REST APIs
 
 
 ## How to write an API ?
 
 First write an YML with your URLs, Parameters, Validations, Constraints, Hooks, Handlers and Documentation. All in one place :)
+
 You could use JSON too, in fact, YML is translated to JSON.
 
+**uris.yml**
 ```yml
 
 # The identifier must be unique, YML overwrite keys.
@@ -62,24 +61,27 @@ get-date-diff: # this will be the client function name camel-cased.
         #here put your application data, ex: access control using user-permissions
 ```
 
-After that create expressionist and load the YML.
-
+**server.js**
 ```js
 
     var Expressionist = require("apis-expressionist"),
         expressionist,
         express = require("express"),
-        app = express();
+        app = express(),
+        cookieParser = require('cookie-parser'),
+        bodyParser = require('body-parser'),
+        router = express.Router();
 
     // init express
-    // this will change when express 4.0 it's released
-    app.use(express.cookieParser('no-more-secrets'));
-    app.use(express.bodyParser());
+    app.use(cookieParser('no-more-secrets'));
+    app.use(bodyParser.urlencoded({ extended: false }))
+
+    // DO NOT: `app.use(router);` will be called for you
+
 
     // init expressionist
-    expressionist = new Expresionist();
+    expressionist = new Expresionist(app, router);
     expressionist.rootDir = __dirname;
-    expressionist.attach(app);
 
     // loading YML file
     expressionist.loadYML("uris.yml", function () {
@@ -89,7 +91,13 @@ After that create expressionist and load the YML.
     // groups can be used to export documentation and sort client code.
     expressionist.loadYML(["common-hooks.yml", "users.yml"], "users", function () {
         // note: YML exception will not match line in file
+
+        expressionist.listen(80);
+
+        //save documentation
+        expressionist.saveDoc();
     });
+
 
 ```
 
@@ -192,30 +200,30 @@ It's just a way to translate a string into function but requiring a module, not 
 
 #### Request (req)
 
-Two changes from express
+Extend [express.request](http://expressjs.com/4x/api.html#req.params)
 
-* Add **route** It's all the route JSON, here you can access your "data"
-* Replace params for a 100% compatible object. *params* in express is an array that has keys, that's an object.
-
-* primary [boolean] Tell you if the request is HTTP (true) or is using expressionist.call method (false)
+* `route` It's all the route JSON, here you can access your "data"
+* `primary` Boolean (always true atm) is an internal-request ?
 
 #### Response (res)
 
-**Do not use res.send** unlike you really want it! this will raise a warning.
+Extend [express.response](http://expressjs.com/4x/api.html#res.status)
 
-This is not the way to work with expressionist (it's the 'express' way). You should use: setResponse
-Expressionist is compatible with existing 'express' applications but encourage you to use another aproach.
+* `setResponse` (Object response)
+* `getResponse` () : Object
+* `addError` (Number: http_status, String: message, Number: code, String: long_message)
+* `hasErrors` () : Boolean
+* `addWarning` (String: message, Number: code, String: long_message)
+* `hasWarnings` (): Boolean
+* `content` = {}
 
-Additions:
-
-* **setResponse** (response)
-* **getResponse** (response)
-* **addError** (status, message, code, long_message)
-* **hasErrors** ()
-* **addWarning** (message, code, long_message)
-* **hasWarnings** ()
-* **content** = {}
   variable where response, errors & warnings are stored. Use it with caution!
+
+**Do not use res.send** unlike you really want it!
+
+This is not the way to work with `expressionist` (it's the `express` way). You should use: `setResponse`
+
+`expressionist` is compatible with existing `express` applications but encourage you to use another approach.
 
 
 #### Callback (next)
@@ -295,11 +303,20 @@ Note: Response HTTP status code will be the one in the first error: 400. Express
 Same idea as requestHooks, but this time after the handler, so they have the response.
 Useful for response encoding, set headers, close connections to database, etc.
 
+## Documentation
 
+`expressionist.saveDoc("doc.html")`
+
+will generate:
+* doc.html
+* documentator.css
+* documentator.html.js
+
+example: [doc.html](http://htmlpreview.github.io/?https://github.com/llafuente/node-expressionist/blob/master/test/doc.html)
 
 ## Client generation
 
-usage: expresionist.nodeClient(String base_url, Function post_process)
+usage: expresionist.getNodeClient(String base_url)
 
 example:
 
@@ -323,11 +340,9 @@ users-read-one: #users.readOne
 ```js
 expressionist.loadYML("users.yml", "users", function () {
 });
-var client = expresionist.nodeClient("http://www.mydomain.com", function (data) {
-    return JSON.parse(data);
-});
+var client = expresionist.nodeClient("http://www.mydomain.com");
 
-client.users.readOne(1, {/*get*/}, {/*post*/}, function(err, data, res) {
+client.users.readOne(1, {/*get*/}, {/*post*/}, function(err, response, body) {
 });
 ```
 
@@ -339,9 +354,6 @@ Notes:
 * Then the callback
 * everything is required
 
-TODO:
-
-* generate a documentation or even even better, a file.
 
 ## Why exceptions?
 

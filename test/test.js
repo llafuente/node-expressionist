@@ -11,6 +11,7 @@
         bodyParser = require("body-parser"),
         cookieParser = require('cookie-parser'),
         app = express(),
+        router = express.Router(),
         server,
         request = require("request"),
         req_timeout = 250,
@@ -21,9 +22,8 @@
     app.use(bodyParser());
 
     test("init and attach", function (t) {
-        expresionist = new Expresionist();
+        expresionist = new Expresionist(app, router);
         expresionist.rootDir = __dirname;
-        expresionist.attach(app);
         t.equal(expresionist.app, app, "app ready!");
 
         t.end();
@@ -39,52 +39,62 @@
         });
     });
 
+    test("listen", function (t) {
+        server = expresionist.listen(8666);
+        t.end();
+    });
+
     test("call /users/login without parameters", function (t) {
-        expresionist.call("/users/login", "post", {}, function (response) {
-            t.equal(response.errors !== undefined, true, "has errors");
-            t.equal(response.errors.length, 3, "three errors in particular");
+        expresionist.call("post", {
+            url:"/users/login"
+        }, function (err, response, body) {
+            t.equal(body.errors !== undefined, true, "has errors");
+            t.equal(body.errors.length, 3, "three errors in particular");
             t.end();
         });
     });
 
     test("call /users/login with invalid parameters", function (t) {
-        expresionist.call("/users/login", "post", {
+        expresionist.call("post", {
+            url: "/users/login",
             body: {
                 username: "t",
                 password: "t168165d1f6sd8f1sd68f1sd6f8ds4f16s841s6df51sd6f8sd1f6d5f16s8d4f16sd51fd6s546464t168165d1f6sd8f1sd68f1sd6f8ds4f16s841s6df51sd6f8sd1f6d5f16s8d4f16sd51fd6s546464",
                 timestamp: "4635618"
             }
-        }, function (response) {
-            t.equal(response.success, false);
-            t.equal(response.errors.length, 2);
+        }, function (err, response, body) {
+            t.equal(body.success, false);
+            t.equal(body.errors.length, 2);
             t.end();
         });
     });
 
     test("call /users/login with parameters", function (t) {
-        expresionist.call("/users/login", "post", {
+        expresionist.call("post", {
+            url: "/users/login",
             body: {
                 username: "test",
                 password: "test",
                 timestamp: "0"
             }
-        }, function (response) {
+        }, function (err, response, body) {
 
-            t.equal(response.success, true, "OK!");
+            t.equal(body.success, true, "OK!");
             t.end();
         });
     });
 
     test("call /test/date invalid date", function (t) {
-        expresionist.call("/test/date", "get", {
+        expresionist.call("get", {
+            url: "/test/date",
             query: {
                 date: "2000-12-35"
             }
-        }, function (response) {
-            t.equal(response.success, false, "KO");
-            t.equal(response.errors.length, 1, "1 error");
-            t.equal(response.errors[0].message, "invalid-input-query");
-            t.equal(response.errors[0].long_message, "constraint [date] fail", "constraint [date] fail");
+        }, function (err, response, body) {
+            t.equal(body.success, false, "KO");
+            t.equal(body.errors.length, 1, "1 error");
+            t.equal(body.errors[0].message, "invalid-input-query");
+            t.equal(body.errors[0].long_message, "constraint [date] fail", "constraint [date] fail");
 
             t.end();
         });
@@ -93,32 +103,34 @@
     test("call /test/date invalid date", function (t) {
         var tdate = "2000-12-01",
             ddate = new Date(tdate);
-        expresionist.call("/test/date", "get", {
+
+        expresionist.call("get", {
+            url: "/test/date",
             query: {
                 date: tdate
             }
-        }, function (response) {
-            t.equal(response.success, true, "KO");
-            t.equal(ddate.toString(), response.date.toString(), "1 error");
+        }, function (err, response, body) {
+            t.equal(body.success, true, "KO");
+
+            t.equal(JSON.parse(JSON.stringify(ddate)), body.date, "1 error");
 
             t.end();
         });
     });
 
-
-
     test("call /test/object-param error input", function (t) {
 
-        expresionist.call("/test/object-param", "get", {
+        expresionist.call("get", {
+            url: "/test/object-param",
             query: {
                 user: {
                     name: "peter"
                 }
             }
-        }, function (response) {
-            t.equal(response.success, false, "KO");
-            t.equal(response.errors.length, 1, "1 error");
-            t.equal(response.errors[0].long_message, "user.surname is undefined", "[surname] is undefined");
+        }, function (err, response, body) {
+            t.equal(body.success, false, "KO");
+            t.equal(body.errors.length, 1, "1 error");
+            t.equal(body.errors[0].long_message, "user.surname is undefined", "[surname] is undefined");
 
             t.end();
         });
@@ -126,18 +138,19 @@
 
     test("call /test/object-param error input", function (t) {
 
-        expresionist.call("/test/object-param", "get", {
+        expresionist.call("get", {
+            url: "/test/object-param",
             query: {
                 user: {
                     name: "peter",
                     surname: ""
                 }
             }
-        }, function (response) {
-            t.equal(response.success, false, "KO");
-            t.equal(response.errors.length, 1, "1 error");
-            t.equal(response.errors[0].message, "invalid-input-query");
-            t.equal(response.errors[0].long_message, "constraint [length] fail", "constraint [length] fail");
+        }, function (err, response, body) {
+            t.equal(body.success, false, "KO");
+            t.equal(body.errors.length, 1, "1 error");
+            t.equal(body.errors[0].message, "invalid-input-query");
+            t.equal(body.errors[0].long_message, "constraint [length] fail", "constraint [length] fail");
 
             t.end();
         });
@@ -145,15 +158,16 @@
 
     test("call /test/object-param error input", function (t) {
 
-        expresionist.call("/test/object-param", "get", {
+        expresionist.call("get", {
+            url: "/test/object-param",
             query: {
                 user: {
                     name: "peter",
                     surname: "lawford"
                 }
             }
-        }, function (response) {
-            t.equal(response.success, true, "OK");
+        }, function (err, response, body) {
+            t.equal(body.success, true, "OK");
 
             t.end();
         });
@@ -161,18 +175,19 @@
 
     test("call /test/object-param2 (reference type) error input", function (t) {
 
-        expresionist.call("/test/object-param2", "get", {
+        expresionist.call("get", {
+            url: "/test/object-param2",
             query: {
                 user: {
                     name: "peter",
                     surname: ""
                 }
             }
-        }, function (response) {
-            t.equal(response.success, false, "KO");
-            t.equal(response.errors.length, 1, "1 error");
-            t.equal(response.errors[0].message, "invalid-input-query");
-            t.equal(response.errors[0].long_message, "constraint [length] fail", "constraint [length] fail");
+        }, function (err, response, body) {
+            t.equal(body.success, false, "KO");
+            t.equal(body.errors.length, 1, "1 error");
+            t.equal(body.errors[0].message, "invalid-input-query");
+            t.equal(body.errors[0].long_message, "constraint [length] fail", "constraint [length] fail");
 
             t.end();
         });
@@ -180,15 +195,14 @@
 
     test("call /test/continue-on-error return many errors", function (t) {
 
-        expresionist.call("/test/continue-on-error", "get", {
+        expresionist.call("get", {
+            url: "/test/continue-on-error"
             // do not send cookies, auth will fail
-        }, function (response) {
-
-
-            t.equal(response.success, false, "KO");
-            t.equal(response.errors.length, 2, "1 error");
-            t.equal(response.errors[0].message, "invalid-input-query");
-            t.equal(response.errors[1].message, "invalid-auth");
+        }, function (err, response, body) {
+            t.equal(body.success, false, "KO");
+            t.equal(body.errors.length, 2, "1 error");
+            t.equal(body.errors[0].message, "invalid-input-query");
+            t.equal(body.errors[1].message, "invalid-auth");
 
             t.end();
         });
@@ -196,14 +210,15 @@
 
     test("call /date-diff", function (t) {
 
-        expresionist.call("/date-diff", "get", {
+        expresionist.call("get", {
+            "url": "/date-diff",
             // do not send cookies, auth will fail
             query: {
                 date: "2013-01-01 12:00:00"
             }
-        }, function (response) {
-            t.equal(response.success, true, "success!");
-            t.equal(response.diff, -3600000, "-1hour (ms)");
+        }, function (err, response, body) {
+            t.equal(body.success, true, "success!");
+            t.equal(body.diff, -3600000, "-1hour (ms)");
 
 
             t.end();
@@ -212,11 +227,12 @@
 
     test("call /server-date", function (t) {
 
-        expresionist.call("/server-date", "get", {
-        }, function (response) {
+        expresionist.call("get", {
+            url: "/server-date"
+        }, function (err, response, body) {
 
-            t.equal(response.success, true, "success!");
-            t.equal(response.date.getTime(), (new Date("2013-01-01 13:00:00")).getTime(), "");
+            t.equal(body.success, true, "success!");
+            t.equal(new Date(body.date).getTime(), (new Date("2013-01-01 13:00:00")).getTime(), "");
 
 
             t.end();
@@ -225,10 +241,11 @@
 
     test("call /server-bad-date", function (t) {
 
-        expresionist.call("/server-bad-date", "get", {
-        }, function (response) {
-            t.equal(response.success, false, "success!");
-            t.equal(response.errors[0].message, "invalid-output", "invalid-input message");
+        expresionist.call("get", {
+            url: "/server-bad-date"
+        }, function (err, response, body) {
+            t.equal(body.success, false, "success!");
+            t.equal(body.errors[0].message, "invalid-output", "invalid-input message");
 
             t.end();
         });
@@ -236,18 +253,19 @@
 
     test("call /users/login-alt", function (t) {
 
-        expresionist.call("/users/login-alt", "post", {
-                query: {
-                    username: "user-test"
-                },
-                body: {
-                    password: "pwd-test"
-                }
-        }, function (response) {
+        expresionist.call("post", {
+            url: "/users/login-alt",
+            query: {
+                username: "user-test"
+            },
+            body: {
+                password: "pwd-test"
+            }
+        }, function (err, response, body) {
 
-            t.equal(response.success, true, "success!");
-            t.equal(response.username, "user-test", "username is the given one");
-            t.equal(response.password, "pwd-test", "password is the given one");
+            t.equal(body.success, true, "success!");
+            t.equal(body.username, "user-test", "username is the given one");
+            t.equal(body.password, "pwd-test", "password is the given one");
 
             t.end();
         });
@@ -255,14 +273,32 @@
 
 
 
-    test("generate documentation", function (t) {
+    test("call /users/login-alt", function (t) {
 
-        expresionist.exportDoc("doc.html");
-        t.end();
+        var client = expresionist.getNodeClient("http://localhost:8666");
+
+        client.test.usersLoginAlt({
+                username: "user-test"
+            },{
+                password: "pwd-test"
+            }, function (err, response, body) {
+
+            t.equal(body.success, true, "success!");
+            t.equal(body.username, "user-test", "username is the given one");
+            t.equal(body.password, "pwd-test", "password is the given one");
+
+            t.end();
+        })
+
     });
 
-    test("listen", function (t) {
-        server = expresionist.listen(8081);
+
+
+
+
+
+    test("generate documentation", function (t) {
+        expresionist.saveDoc("doc.html");
         t.end();
     });
 
