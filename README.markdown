@@ -5,7 +5,9 @@
 
 ## Introduction
 
+```js
 Expresionist.wrapper(express).for(['Write', 'Document', 'Generate client']).of('REST APIs')
+```
 
 aka: Wrapper on top of express to Write, Document and 'Create the client'™ of REST APIs
 
@@ -119,7 +121,7 @@ Contains the following parameters
 
 * **params, get, post & files**
 
-  Input schema. See (utilitario)[https://github.com/llafuente/utilitario] module for more information.
+  Input schema. See [utilitario](https://github.com/llafuente/utilitario) module for more information.
   * **cast**
   * **constraints**, list/object of constraints that the input has to meet.
   * **object**, require "cast: object", define the schema of each key
